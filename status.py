@@ -6,7 +6,6 @@ import os
 import requests
 import socket
 import sys
-import time
 from prettytable import PrettyTable
 from flask import Flask, render_template
 
@@ -17,6 +16,7 @@ rpc_user = os.getenv("RPC_USER")
 rpc_pass = os.getenv("RPC_PASS")
 connection_string = "http://" + bitcoind_host + ":" + str(bitcoind_port)
 start_time = datetime.datetime.utcnow().isoformat()
+
 
 def conn_check():
     ''' Takes no input, just runs the connection check, exit if fail'''
@@ -39,9 +39,9 @@ def build_table() -> str:
 
     # Need two different API calls to get info
     headers = {'content-type': 'text/plain'}
-    payload1 = json.dumps({"jsonrpc": "1.0", "id":"curltest", "method": "getblockchaininfo", "params": [] })
-    payload2 = json.dumps({"jsonrpc": "1.0", "id":"curltest", "method": "getconnectioncount", "params": [] })
-    
+    payload1 = json.dumps({"jsonrpc": "1.0", "id": "curltest", "method": "getblockchaininfo", "params": [] })
+    payload2 = json.dumps({"jsonrpc": "1.0", "id": "curltest", "method": "getconnectioncount", "params": [] })
+
     # Make the requests
     r1 = requests.post(connection_string, data=payload1, auth=(rpc_user, rpc_pass), headers=headers)
     s1 = r1.status_code
@@ -60,8 +60,8 @@ def build_table() -> str:
     # Here we assemble the table
     x = PrettyTable()
     x.field_names = ["Name", "Value"]
-    x.align = "l" 
-    x.add_rows( 
+    x.align = "l"
+    x.add_rows(
         [
             ["Node location", connection_string],
             ["Chain", chain],
@@ -74,7 +74,7 @@ def build_table() -> str:
     )
     print("STATE: ASCII version of the table is below")
     print(x)
-    html = x.get_html_string(attributes={"class":"table is-bordered is-striped is-hoverable is-fullwidth"})
+    html = x.get_html_string(attributes={"class": "table is-bordered is-striped is-hoverable is-fullwidth"})
     return html
 
 
@@ -99,8 +99,10 @@ else:
 # Flask
 app = Flask(__name__)
 @app.route("/")
+
+
 def index():
-    return render_template("index.html", message=build_table());   
+    return render_template("index.html", message=build_table());
 
 
 if __name__ == "__main__":
