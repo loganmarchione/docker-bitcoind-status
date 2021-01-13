@@ -1,0 +1,36 @@
+<!DOCTYPE html>                                                                                                                                             
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Bitcoind status</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
+    <nav class="navbar is-info" role="navigation" aria-label="main navigation">
+      <div class="navbar-brand">
+        <a class="navbar-item" href="#">
+        ₿itcoind status page
+        </a>
+      </div>
+    </nav>
+  </head>
+  <body>
+    <section class="section">
+      <div class="container">
+        <h1 class="title">
+          Bitcoin node status
+        </h1>
+        <div class="table-container">
+          {{ message | safe }}
+        </div>
+      </div>
+    </section>
+  </body>
+  <footer class="footer">
+    <div class="content has-text-centered">
+      <p>
+        <strong>docker-bitcoind-status</strong> by <a href="https://github.com/loganmarchione">Logan Marchione</a>. Source code available on <a href="https://github.com/loganmarchione/docker-bitcoind-status">Github</a>.
+        <br></br>CSS by <a href="https://bulma.io">Bulma.io</a>.
+      </p>
+    </div>
+  </footer>
+</html>
