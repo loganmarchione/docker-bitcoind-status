@@ -33,7 +33,7 @@ Uses Bitcoin's RPC interface to get node data and display it in a Python Flask a
 | BITCOIND_HOST  | No (default: localhost)    | Bitcoin node address                           | 'localhost' or your Docker service name     |                                                                                                  |
 | BITCOIND_PORT  | No (default: 8086)         | Bitcoin node                                   | 8086                                        |                                                                                                  |
 | RPC_USER       | Yes                        | RPC username                                   | satoshi                                     |                                                                                                  |
-| RPC_PASS       | Yes                        | RPC password                                   | Bitco0nIsGreat1                             |                                                                                                  |
+| RPC_PASS       | Yes                        | RPC password                                   | Bitc0inIsGreat1                             |                                                                                                  |
 
 ### Ports
 | Port on host              | Port in container | Comments              |
@@ -55,7 +55,7 @@ services:
       - BITCOIND_HOST=10.10.1.4
       - BITCOIND_PORT=8086
       - RPC_USER=satoshi
-      - RPC_PASS=Bitco0nIsGreat1
+      - RPC_PASS=Bitc0inIsGreat1
     networks:
       - bitcoin
     image: loganmarchione/docker-bitcoind-status:latest
