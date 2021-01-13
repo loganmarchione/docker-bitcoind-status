@@ -39,15 +39,15 @@ def build_table() -> str:
 
     # Need two different API calls to get info
     headers = {'content-type': 'text/plain'}
-    payload1 = json.dumps({"jsonrpc": "1.0", "id": "curltest", "method": "getblockchaininfo", "params": [] })
-    payload2 = json.dumps({"jsonrpc": "1.0", "id": "curltest", "method": "getconnectioncount", "params": [] })
+    payload1 = json.dumps({"jsonrpc": "1.0", "id": "curltest", "method": "getblockchaininfo", "params": []})
+    payload2 = json.dumps({"jsonrpc": "1.0", "id": "curltest", "method": "getconnectioncount", "params": []})
 
     # Make the requests
     r1 = requests.post(connection_string, data=payload1, auth=(rpc_user, rpc_pass), headers=headers)
-    s1 = r1.status_code
+    s1 = r1.status_code  # noqa: F841
     my_json1 = r1.json()
     r2 = requests.post(connection_string, data=payload2, auth=(rpc_user, rpc_pass), headers=headers)
-    s2 = r2.status_code
+    s2 = r2.status_code  # noqa: F841
     my_json2 = r2.json()
 
     # Save that responses to variables
@@ -98,11 +98,11 @@ else:
 
 # Flask
 app = Flask(__name__)
+
+
 @app.route("/")
-
-
 def index():
-    return render_template("index.html", message=build_table());
+    return render_template("index.html", message=build_table())
 
 
 if __name__ == "__main__":
