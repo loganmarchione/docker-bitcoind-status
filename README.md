@@ -11,6 +11,8 @@ Uses Bitcoin's RPC interface to get node data and display it in a Python Flask a
   - Init system: N/A
   - Application: N/A
 
+![Screenshot](screenshots/2021-01-12.png?raw=true "Screenshot")
+
 ## Explanation
 
   - Heavily inspired by [this script](https://github.com/mameier/bitcoind-status-bash), but implemented (poorly) in Python, runs in Docker, and uses Bitcoin's RPC interface (to connect to remote nodes)
@@ -31,7 +33,7 @@ Uses Bitcoin's RPC interface to get node data and display it in a Python Flask a
 | Variable       | Required?                  | Definition                                     | Example                                     | Comments                                                                                         |
 |----------------|----------------------------|------------------------------------------------|---------------------------------------------|--------------------------------------------------------------------------------------------------|
 | BITCOIND_HOST  | No (default: localhost)    | Bitcoin node address                           | 'localhost' or your Docker service name     |                                                                                                  |
-| BITCOIND_PORT  | No (default: 8086)         | Bitcoin node                                   | 8086                                        |                                                                                                  |
+| BITCOIND_PORT  | No (default: 8332)         | Bitcoin node                                   | 8332                                        |                                                                                                  |
 | RPC_USER       | Yes                        | RPC username                                   | satoshi                                     |                                                                                                  |
 | RPC_PASS       | Yes                        | RPC password                                   | Bitc0inIsGreat1                             |                                                                                                  |
 
@@ -53,11 +55,13 @@ services:
     restart: unless-stopped
     environment:
       - BITCOIND_HOST=10.10.1.4
-      - BITCOIND_PORT=8086
+      - BITCOIND_PORT=8332
       - RPC_USER=satoshi
       - RPC_PASS=Bitc0inIsGreat1
     networks:
       - bitcoin
+    ports:
+      - '5000:5000'
     image: loganmarchione/docker-bitcoind-status:latest
 
 networks:
