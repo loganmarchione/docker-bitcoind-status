@@ -4,7 +4,7 @@
 [![Docker Image Size (latest semver)](https://img.shields.io/docker/image-size/loganmarchione/docker-bitcoind-status)](https://hub.docker.com/r/loganmarchione/docker-bitcoind-status)
 [![MicroBadger Layers](https://img.shields.io/microbadger/layers/loganmarchione/docker-bitcoind-status)](https://microbadger.com/images/loganmarchione/docker-bitcoind-status)
 
-Uses Bitcoin RPC interface to get node data and display it in a Python Flask application
+Uses Bitcoin's RPC interface to get node data and display it in a Python Flask application
   - Source code: [GitHub](https://github.com/loganmarchione/docker-bitcoind-status)
   - Docker container: [Docker Hub](https://hub.docker.com/r/loganmarchione/docker-bitcoind-status)
   - Image base: [Python (Alpine)](https://hub.docker.com/_/python)
@@ -13,8 +13,8 @@ Uses Bitcoin RPC interface to get node data and display it in a Python Flask app
 
 ## Explanation
 
-  - Heavily inspired by [this script], but implemented in Python, runs in Docker, and uses Bitcoin's RPC interface (to connect to remote nodes)
-  - ⚠️ Bitcoin's RPC connection is not encrypted, do not use this over the public internet ⚠️
+  - Heavily inspired by [this script](https://github.com/mameier/bitcoind-status-bash), but implemented (poorly) in Python, runs in Docker, and uses Bitcoin's RPC interface (to connect to remote nodes)
+  - ⚠️ Bitcoin's RPC connection is not encrypted via SSL ([as-of v0.12.0](https://github.com/bitcoin/bitcoin/blob/master/doc/release-notes/release-notes-0.12.0.md#rpc-ssl-support-dropped)), so do **NOT** use this over the public internet ⚠️
   - ⚠️ I would recomment **NOT** running a wallet on the node you're querying, to minimize chance of loss of funds ⚠️
 
 ## Requirements
