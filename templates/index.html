@@ -10,6 +10,11 @@
         <a class="navbar-item" href="#">
         ₿itcoind status page
         </a>
+        <span class="navbar-item">
+          <span class="tag">
+          {{ price }} {{ currency }}
+          </span>
+        </span>
       </div>
     </nav>
   </head>
@@ -20,7 +25,13 @@
           Bitcoin node status
         </h1>
         <div class="table-container">
-          {{ message | safe }}
+          {{ table1 | safe }}
+        </div>
+        <h1 class="title">
+          Blockchain info
+        </h1>
+        <div class="table-container">
+          {{ table2 | safe }}
         </div>
       </div>
     </section>
@@ -28,11 +39,12 @@
   <footer class="footer">
     <div class="content has-text-centered">
       <p>
-        <strong>docker-bitcoind-status</strong> by <a href="https://github.com/loganmarchione">Logan Marchione</a>.
+        <strong>docker-bitcoind-status {{ version }}</strong> by <a href="https://github.com/loganmarchione">Logan Marchione</a>.
         Source code available on <a href="https://github.com/loganmarchione/docker-bitcoind-status"><img height="16" width="16" src="https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/github.svg"/> Github</a>.
         <br></br>
         CSS by <a href="https://bulma.io"><img height="16" width="16" src="https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/bulma.svg"/> Bulma.io</a>.
         Icons by <a href="https://simpleicons.org"><img height="16" width="16" src="https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/simpleicons.svg"/> Simple Icons</a>.
+        Price information by <a href="https://coinbase.com"><img height="16" width="16" src="https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/coinbase.svg"/> Coinbase</a>.
         <br></br>
         <a href="https://bitcoin.org"><img height="16" width="16" src="https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/bitcoin.svg"/></a>
       </p>

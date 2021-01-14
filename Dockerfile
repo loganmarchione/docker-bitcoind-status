@@ -17,13 +17,13 @@ WORKDIR /usr/scr/app
 
 COPY requirements.txt .
 
-RUN pip3 install -r requirements.txt
-
 COPY status.py .
+
+COPY VERSION .
 
 COPY templates templates/
 
-COPY VERSION /
+RUN pip3 install -r requirements.txt
 
 EXPOSE 5000
 

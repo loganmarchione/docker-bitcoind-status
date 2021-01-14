@@ -12,14 +12,42 @@ from flask import Flask, render_template
 # Variables
 bitcoind_host = os.getenv("BITCOIND_HOST", "localhost")
 bitcoind_port = int(os.getenv("BITCOIND_PORT", 8332))
+connection_string = "http://" + bitcoind_host + ":" + str(bitcoind_port)
 rpc_user = os.getenv("RPC_USER")
 rpc_pass = os.getenv("RPC_PASS")
-connection_string = "http://" + bitcoind_host + ":" + str(bitcoind_port)
+currency = os.getenv("CURRENCY", "USD")
 start_time = datetime.datetime.utcnow().isoformat()
+
+# Get version file
+with open('VERSION') as f:
+    version = f.readline()
+
+def price_check(c: str) -> int:
+    '''
+    Takes in currency code, returns Bitcoin price
+
+    Parameters:
+        c (str):    Currency code from Coinbase https://api.coinbase.com/v2/currencies
+
+    Returns:
+        int         Bitcoin price in that currency
+    '''
+
+    url = "https://api.coinbase.com/v2/prices/BTC-" + c + "/spot"
+
+    try:
+        print("STATE: Running price check", url)
+        r = requests.get(url).json()
+        price = r['data']['amount']
+        return price
+    except requests.exceptions.ConnectionError as err:
+        print("ERROR: Price check error", err)
+        e = "Price error"
+        return e
 
 
 def conn_check():
-    ''' Takes no input, just runs the connection check, exit if fail'''
+    '''Takes no input, just runs the connection check, exit if fail'''
 
     print("STATE: Running connection check on", connection_string)
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -31,31 +59,23 @@ def conn_check():
         sys.exit(1)
 
 
-def build_table() -> str:
-    '''Takes no input, just builds the table'''
+def build_table1() -> str:
+    '''Takes no input, just builds the table and output HTML'''
 
     # First, check the connection
     conn_check()
 
-    # Need two different API calls to get info
+    # RPC calls to get info
     headers = {'content-type': 'text/plain'}
-    payload1 = json.dumps({"jsonrpc": "1.0", "id": "curltest", "method": "getblockchaininfo", "params": []})
-    payload2 = json.dumps({"jsonrpc": "1.0", "id": "curltest", "method": "getconnectioncount", "params": []})
+    payload1 = json.dumps({"jsonrpc": "1.0", "id": "curltest", "method": "getnetworkinfo", "params": []})
+    r1 = requests.post(connection_string, data=payload1, auth=(rpc_user, rpc_pass), headers=headers).json()
+    payload2 = json.dumps({"jsonrpc": "1.0", "id": "curltest", "method": "uptime", "params": []})
+    r2 = requests.post(connection_string, data=payload2, auth=(rpc_user, rpc_pass), headers=headers).json()
 
-    # Make the requests
-    r1 = requests.post(connection_string, data=payload1, auth=(rpc_user, rpc_pass), headers=headers)
-    s1 = r1.status_code  # noqa: F841
-    my_json1 = r1.json()
-    r2 = requests.post(connection_string, data=payload2, auth=(rpc_user, rpc_pass), headers=headers)
-    s2 = r2.status_code  # noqa: F841
-    my_json2 = r2.json()
-
-    # Save that responses to variables
-    chain = my_json1['result']['chain']
-    blocks = my_json1['result']['blocks']
-    difficulty = my_json1['result']['difficulty']
-    verificationprogress = my_json1['result']['verificationprogress']
-    connections = my_json2['result']
+    # Save the responses to variables
+    subversion = r1['result']['subversion']
+    connections = r1['result']['connections']
+    uptime = int(r2['result'])
 
     # Here we assemble the table
     x = PrettyTable()
@@ -64,17 +84,51 @@ def build_table() -> str:
     x.add_rows(
         [
             ["Node location", connection_string],
-            ["Chain", chain],
+            ["Client version", subversion.strip('/')],
             ["Connections", connections],
-            ["Block number", blocks],
-            ["Difficulty", difficulty],
-            ["Verification", verificationprogress],
+            ["Uptime", str(datetime.timedelta(seconds = uptime))],
             ["Last refreshed time (UTC)", datetime.datetime.utcnow().isoformat()]
         ]
     )
-    print("STATE: ASCII version of the table is below")
-    print(x)
     html = x.get_html_string(attributes={"class": "table is-bordered is-striped is-hoverable is-fullwidth"})
+    return html
+
+
+def build_table2() -> str:
+    '''Takes no input, just builds the table and output HTML'''
+
+    # First, check the connection
+    conn_check()
+
+    # RPC calls to get info
+    headers = {'content-type': 'text/plain'}
+    payload1 = json.dumps({"jsonrpc": "1.0", "id": "curltest", "method": "getblockchaininfo", "params": []})
+    r1 = requests.post(connection_string, data=payload1, auth=(rpc_user, rpc_pass), headers=headers).json()
+
+    # Save the responses to variables
+    chain = r1['result']['chain']
+    blocks = r1['result']['blocks']
+    difficulty = r1['result']['difficulty']
+    verificationprogress = r1['result']['verificationprogress']
+    size_on_disk = int(r1['result']['size_on_disk'])
+    pruned = r1['result']['pruned']
+
+    # Here we assemble the table
+    y = PrettyTable()
+    y.field_names = ["Name", "Value"]
+    y.align = "l"
+    y.add_rows(
+        [
+            ["Chain", chain],
+            ["Block number", blocks],
+            ["Difficulty", difficulty],
+            ["Verification", verificationprogress],
+            ["Size on disk (GB)", round((size_on_disk / 1000 / 1000 / 1000), 2)],
+            ["Is pruned?", pruned],
+            ["Last refreshed time (UTC)", datetime.datetime.utcnow().isoformat()]
+        ]
+    )
+    html = y.get_html_string(attributes={"class": "table is-bordered is-striped is-hoverable is-fullwidth"})
     return html
 
 
@@ -96,13 +150,14 @@ else:
     print("ERROR: RPC_PASS is not set")
     sys.exit(1)
 
+
 # Flask
 app = Flask(__name__)
 
 
 @app.route("/")
 def index():
-    return render_template("index.html", message=build_table())
+    return render_template("index.html", table1=build_table1(), table2=build_table2(), version=version, currency=currency, price=price_check(currency))
 
 
 if __name__ == "__main__":
