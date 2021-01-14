@@ -11,7 +11,7 @@ Uses Bitcoin's RPC interface to get node data and display it in a Python Flask a
   - Init system: N/A
   - Application: N/A
 
-![Screenshot](screenshots/2021-01-12.png?raw=true "Screenshot")
+![Screenshot](screenshots/2021-01-13.png?raw=true "Screenshot")
 
 ## Explanation
 
