@@ -36,6 +36,7 @@ Uses Bitcoin's RPC interface to get node data and display it in a Python Flask a
 | BITCOIND_PORT  | No (default: 8332)         | Bitcoin node                                   | 8332                                        |                                                                                                  |
 | RPC_USER       | Yes                        | RPC username                                   | satoshi                                     |                                                                                                  |
 | RPC_PASS       | Yes                        | RPC password                                   | Bitc0inIsGreat1                             |                                                                                                  |
+| CURRENCY       | No (default: USD)          | Three-digit currency code                      | USD                                         | `https://api.coinbase.com/v2/currencies`                                                         |
 
 ### Ports
 | Port on host              | Port in container | Comments              |
@@ -58,6 +59,7 @@ services:
       - BITCOIND_PORT=8332
       - RPC_USER=satoshi
       - RPC_PASS=Bitc0inIsGreat1
+      - CURRENCY=USD
     networks:
       - bitcoin
     ports:
@@ -75,3 +77,7 @@ networks:
 - [ ] Add a [healthcheck](https://docs.docker.com/engine/reference/builder/#healthcheck)
 - [ ] Change connection timeout (currently default)
 - [ ] Fix error on bad node connection (should exit, but doesn't) 
+- [x] ~~Add second table~~
+- [ ] Find more elegant way to make the RPC calls
+- [X] ~~Add price check~~
+- [ ] Add exception handling to price check
