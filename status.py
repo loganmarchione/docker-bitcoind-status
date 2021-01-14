@@ -22,6 +22,7 @@ start_time = datetime.datetime.utcnow().isoformat()
 with open('VERSION') as f:
     version = f.readline()
 
+
 def price_check(c: str) -> int:
     '''
     Takes in currency code, returns Bitcoin price
@@ -86,7 +87,7 @@ def build_table1() -> str:
             ["Node location", connection_string],
             ["Client version", subversion.strip('/')],
             ["Connections", connections],
-            ["Uptime", str(datetime.timedelta(seconds = uptime))],
+            ["Uptime", str(datetime.timedelta(seconds=uptime))],
             ["Last refreshed time (UTC)", datetime.datetime.utcnow().isoformat()]
         ]
     )
