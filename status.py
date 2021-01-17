@@ -22,6 +22,7 @@ start_time = datetime.datetime.utcnow().isoformat()
 with open('VERSION') as f:
     version = f.readline()
 
+
 def refresh_time() -> datetime:
     '''Takes no input, just return the datetime object'''
 
@@ -86,9 +87,9 @@ def build_table1() -> str:
     connections = int(r1['result']['connections'])
     uptime = int(r2['result'])
     mem_used = int(r3['result']['locked']['used'])
-    mem_free = int(r3['result']['locked']['free'])
+    mem_free = int(r3['result']['locked']['free'])  # noqa: F841
     mem_total = int(r3['result']['locked']['total'])
-    mem_perc = round(((mem_used/mem_total) * 100),2)
+    mem_perc = round(((mem_used/mem_total) * 100), 2)
 
     # Here we assemble the table
     x = PrettyTable()
@@ -100,7 +101,7 @@ def build_table1() -> str:
             ["Client version", subversion.strip('/')],
             ["Connections", connections],
             ["Uptime (days, hour:min:sec)", datetime.timedelta(seconds=uptime)],
-            ["Memory (MB)", "Used: " + str(round((mem_used / 1000),2)) + " of  Total: " + str(round((mem_total / 1000),2)) + " ("  + str(mem_perc) + "% used)"]
+            ["Memory (MB)", "Used: " + str(round((mem_used / 1000), 2)) + " of  Total: " + str(round((mem_total / 1000), 2)) + " (" + str(mem_perc) + "% used)"]
         ]
     )
     html = x.get_html_string(attributes={"class": "table is-bordered is-striped is-hoverable is-fullwidth"})
