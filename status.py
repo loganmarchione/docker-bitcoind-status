@@ -22,6 +22,12 @@ start_time = datetime.datetime.utcnow().isoformat()
 with open('VERSION') as f:
     version = f.readline()
 
+def refresh_time() -> datetime:
+    '''Takes no input, just return the datetime object'''
+
+    r = datetime.datetime.utcnow().isoformat()
+    return r
+
 
 def price_check(c: str) -> int:
     '''
@@ -72,11 +78,17 @@ def build_table1() -> str:
     r1 = requests.post(connection_string, data=payload1, auth=(rpc_user, rpc_pass), headers=headers).json()
     payload2 = json.dumps({"jsonrpc": "1.0", "id": "curltest", "method": "uptime", "params": []})
     r2 = requests.post(connection_string, data=payload2, auth=(rpc_user, rpc_pass), headers=headers).json()
+    payload3 = json.dumps({"jsonrpc": "1.0", "id": "curltest", "method": "getmemoryinfo", "params": ["stats"]})
+    r3 = requests.post(connection_string, data=payload3, auth=(rpc_user, rpc_pass), headers=headers).json()
 
     # Save the responses to variables
-    subversion = r1['result']['subversion']
-    connections = r1['result']['connections']
+    subversion = str(r1['result']['subversion'])
+    connections = int(r1['result']['connections'])
     uptime = int(r2['result'])
+    mem_used = int(r3['result']['locked']['used'])
+    mem_free = int(r3['result']['locked']['free'])
+    mem_total = int(r3['result']['locked']['total'])
+    mem_perc = round(((mem_used/mem_total) * 100),2)
 
     # Here we assemble the table
     x = PrettyTable()
@@ -84,11 +96,11 @@ def build_table1() -> str:
     x.align = "l"
     x.add_rows(
         [
-            ["Node location", connection_string],
+            ["Node address", connection_string],
             ["Client version", subversion.strip('/')],
             ["Connections", connections],
-            ["Uptime", str(datetime.timedelta(seconds=uptime))],
-            ["Last refreshed time (UTC)", datetime.datetime.utcnow().isoformat()]
+            ["Uptime (days, hour:min:sec)", datetime.timedelta(seconds=uptime)],
+            ["Memory (MB)", "Used: " + str(round((mem_used / 1000),2)) + " of  Total: " + str(round((mem_total / 1000),2)) + " ("  + str(mem_perc) + "% used)"]
         ]
     )
     html = x.get_html_string(attributes={"class": "table is-bordered is-striped is-hoverable is-fullwidth"})
@@ -107,12 +119,12 @@ def build_table2() -> str:
     r1 = requests.post(connection_string, data=payload1, auth=(rpc_user, rpc_pass), headers=headers).json()
 
     # Save the responses to variables
-    chain = r1['result']['chain']
-    blocks = r1['result']['blocks']
-    difficulty = r1['result']['difficulty']
-    verificationprogress = r1['result']['verificationprogress']
-    size_on_disk = int(r1['result']['size_on_disk'])
-    pruned = r1['result']['pruned']
+    chain = str(r1['result']['chain'])
+    blocks = int(r1['result']['blocks'])
+    difficulty = float(r1['result']['difficulty'])
+    verificationprogress = float(r1['result']['verificationprogress'])
+    size_on_disk = float(r1['result']['size_on_disk'])
+    pruned = str(r1['result']['pruned'])
 
     # Here we assemble the table
     y = PrettyTable()
@@ -126,7 +138,6 @@ def build_table2() -> str:
             ["Verification", verificationprogress],
             ["Size on disk (GB)", round((size_on_disk / 1000 / 1000 / 1000), 2)],
             ["Is pruned?", pruned],
-            ["Last refreshed time (UTC)", datetime.datetime.utcnow().isoformat()]
         ]
     )
     html = y.get_html_string(attributes={"class": "table is-bordered is-striped is-hoverable is-fullwidth"})
@@ -158,7 +169,7 @@ app = Flask(__name__)
 
 @app.route("/")
 def index():
-    return render_template("index.html", table1=build_table1(), table2=build_table2(), version=version, currency=currency, price=price_check(currency))
+    return render_template("index.html", table1=build_table1(), table2=build_table2(), version=version, currency=currency, price=price_check(currency), refresh=refresh_time())
 
 
 if __name__ == "__main__":
