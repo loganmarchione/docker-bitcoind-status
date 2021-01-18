@@ -16,13 +16,15 @@ Uses Bitcoin's RPC interface to get node data and display it in a Python Flask a
 ## Explanation
 
   - I was looking for a way to monitor my Bitcoin node from my phone, without needing to log in and tail the log files. Products like [mempool.space](https://github.com/mempool/mempool) would work, but were too heavy for what I needed.
-  - This project was heavily inspired by [this script](https://github.com/mameier/bitcoind-status-bash), but implemented (rather poorly) in Python, runs in Docker, and uses Bitcoin's RPC interface (to connect to remote nodes)
+  - This project was heavily inspired by [this script](https://github.com/mameier/bitcoind-status-bash), but implemented (rather poorly) in Python, runs in Docker, and uses Bitcoin's RPC interface (to connect to remote nodes).
+  - All data is obtained from your node, **except** price data (which comes from Coinbase). CSS and icons are from external sources.
   - ⚠️ Bitcoin's RPC connection is not encrypted via SSL ([as-of v0.12.0](https://github.com/bitcoin/bitcoin/blob/master/doc/release-notes/release-notes-0.12.0.md#rpc-ssl-support-dropped)), so do **NOT** use this over the public internet ⚠️
   - ⚠️ I would recomment **NOT** running a wallet on the node you're querying, to minimize chance of loss of funds ⚠️
 
 ## Requirements
 
   - You must already have a working Bitcoin node somewhere, and the ability (via the [bitcon.conf](https://github.com/bitcoin/bitcoin/blob/master/share/examples/bitcoin.conf) file) to connect to that node via the RPC interface.
+  - Because of the number of RPCs required, you'll need to set `rpcworkqueue=32` (or  higher) in `bitcoin.conf`.
 
 ## Docker image information
 
@@ -75,10 +77,10 @@ networks:
 - [ ] Learn Python
 - [ ] Learn Flask
 - [ ] Add a proper web server (e.g., Gunicorn, WSGI, etc...)
-- [ ] Add a [healthcheck](https://docs.docker.com/engine/reference/builder/#healthcheck)
-- [ ] Change connection timeout (currently default)
+- [x] ~~Add a [healthcheck](https://docs.docker.com/engine/reference/builder/#healthcheck)~~
+- [ ] Change request connection timeout (currently default)
 - [ ] Fix error on bad node connection (should exit, but doesn't) 
 - [x] ~~Add second table~~
-- [ ] Find more elegant way to make the RPC calls
-- [X] ~~Add price check~~
+- [ ] Find more elegant way to make the RPCs (maybe a function or something?)
+- [x] ~~Add price check~~
 - [ ] Add exception handling to price check
