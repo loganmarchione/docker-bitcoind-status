@@ -70,6 +70,19 @@ def hash_to_hash(h: int) -> float:
     return x
 
 
+def btc_mined() -> float:
+    '''Takes no input, just return the number of BTC mined'''
+
+    payload1 = json.dumps({"jsonrpc": "1.0", "id": "curltest", "method": "gettxoutsetinfo", "params": []})
+    r1 = requests.post(connection_string, data=payload1, auth=(rpc_user, rpc_pass), headers=headers)
+    j1 = r1.json()
+    r1.close()
+
+    # Save the response to a variable
+    x = float(j1['result']['total_amount'])
+    return x
+
+
 def conn_check():
     '''Takes no input, just runs the connection check, exit if fail'''
 
@@ -128,7 +141,7 @@ def build_table1() -> str:
             ["Memory", "Used: " + str(round((mem_used / 1000), 2)) + " MB of  Total: " + str(round((mem_total / 1000), 2)) + " MB (" + str(mem_perc) + "% used)"]
         ]
     )
-    html = x.get_html_string(attributes={"class": "table is-bordered is-striped is-hoverable is-fullwidth"})
+    html = x.get_html_string(attributes={"class": "table is-bordered is-striped is-hoverable"})
     return html
 
 
@@ -145,15 +158,8 @@ def build_table2() -> str:
     j1 = r1.json()
     r1.close()
 
-    payload2 = json.dumps({"jsonrpc": "1.0", "id": "curltest", "method": "getnetworkhashps", "params": []})
-    r2 = requests.post(connection_string, data=payload2, auth=(rpc_user, rpc_pass), headers=headers)
-    j2 = r2.json()
-    r2.close()
-
-    payload3 = json.dumps({"jsonrpc": "1.0", "id": "curltest", "method": "getnetworkhashps", "params": [-1]})
-    r3 = requests.post(connection_string, data=payload3, auth=(rpc_user, rpc_pass), headers=headers)
-    j3 = r3.json()
-    r3.close()
+    # Get the total number of BTC
+    btc_total = btc_mined()
 
     # Save the responses to variables
     chain = str(j1['result']['chain'])
@@ -163,35 +169,72 @@ def build_table2() -> str:
     verificationprogress = float(j1['result']['verificationprogress'])
     size_on_disk = float(j1['result']['size_on_disk'])
     pruned = str(j1['result']['pruned'])
-    hash_rate = float(j2['result'])
-    hash_rate_last_diff = float(j3['result'])
 
     # Here we assemble the table
-    y = PrettyTable()
-    y.field_names = ["Name", "Value"]
-    y.align = "l"
-    y.add_rows(
+    x = PrettyTable()
+    x.field_names = ["Name", "Value"]
+    x.align = "l"
+    x.add_rows(
         [
             ["Chain", chain],
             ["Block number", blocks],
+            ["BTC in existence", btc_total],
             ["Initial block download?", initial],
             ["Difficulty", difficulty],
             ["Verification", verificationprogress],
             ["Size on disk", str(round((size_on_disk / 1000 / 1000 / 1000), 2)) + " GB"],
-            ["Is pruned?", pruned],
+            ["Is pruned?", pruned]
+        ]
+    )
+    html = x.get_html_string(attributes={"class": "table is-bordered is-striped is-hoverable"})
+    return html
+
+
+def build_table3() -> str:
+    '''Takes no input, just builds the table and output HTML'''
+
+    # First, check the connection
+    conn_check()
+
+    # RPC calls to get info
+    headers = {'content-type': 'text/plain'}
+    payload1 = json.dumps({"jsonrpc": "1.0", "id": "curltest", "method": "getnetworkhashps", "params": []})
+    r1 = requests.post(connection_string, data=payload1, auth=(rpc_user, rpc_pass), headers=headers)
+    j1 = r1.json()
+    r1.close()
+
+    payload2 = json.dumps({"jsonrpc": "1.0", "id": "curltest", "method": "getnetworkhashps", "params": [-1]})
+    r2 = requests.post(connection_string, data=payload2, auth=(rpc_user, rpc_pass), headers=headers)
+    j2 = r2.json()
+    r2.close()
+
+    # Save the responses to variables
+    hash_rate = float(j1['result'])
+    hash_rate_last_diff = float(j2['result'])
+
+    # Here we assemble the table
+    x = PrettyTable()
+    x.field_names = ["Name", "Value"]
+    x.align = "l"
+    x.add_rows(
+        [
             ["Estimated hash rate", str(round(hash_to_hash(hash_rate), 2)) + " EH/s"],
             ["Estimated hash rate (since last difficulty adjustment)", str(round(hash_to_hash(hash_rate_last_diff), 2)) + " EH/s"]
         ]
     )
-    html = y.get_html_string(attributes={"class": "table is-bordered is-striped is-hoverable is-fullwidth"})
+    html = x.get_html_string(attributes={"class": "table is-bordered is-striped is-hoverable"})
     return html
 
+
+#
+# Script actually starts running here
+#
 
 # Some logging
 print("#####\n# Container starting up!\n#####")
 print("STATE: Starting at", start_time)
 
-# Check if variables are set
+# Check if variables are set, otherwise fail
 print("STATE: Checking environment variables...")
 if 'RPC_USER' in os.environ:
     pass
@@ -212,7 +255,7 @@ app = Flask(__name__)
 
 @app.route("/")
 def index():
-    return render_template("index.html", table1=build_table1(), table2=build_table2(), version=version, currency=currency, price=price_check(currency), refresh=refresh_time())
+    return render_template("index.html", table1=build_table1(), table2=build_table2(), table3=build_table3(), version=version, currency=currency, price=price_check(currency), refresh=refresh_time())
 
 
 if __name__ == "__main__":
