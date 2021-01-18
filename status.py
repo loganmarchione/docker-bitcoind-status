@@ -16,6 +16,7 @@ connection_string = "http://" + bitcoind_host + ":" + str(bitcoind_port)
 rpc_user = os.getenv("RPC_USER")
 rpc_pass = os.getenv("RPC_PASS")
 currency = os.getenv("CURRENCY", "USD")
+page_title = os.getenv("PAGE_TITLE", "Bitcoind status")
 start_time = datetime.datetime.utcnow().isoformat()
 
 # Get version file
@@ -67,19 +68,6 @@ def hash_to_hash(h: int) -> float:
 
     #        kilo   mega   giga   tera   peta   exa
     x = (h / 1000 / 1000 / 1000 / 1000 / 1000 / 1000)
-    return x
-
-
-def btc_mined() -> float:
-    '''Takes no input, just return the number of BTC mined'''
-
-    payload1 = json.dumps({"jsonrpc": "1.0", "id": "curltest", "method": "gettxoutsetinfo", "params": []})
-    r1 = requests.post(connection_string, data=payload1, auth=(rpc_user, rpc_pass), headers=headers)
-    j1 = r1.json()
-    r1.close()
-
-    # Save the response to a variable
-    x = float(j1['result']['total_amount'])
     return x
 
 
@@ -158,9 +146,6 @@ def build_table2() -> str:
     j1 = r1.json()
     r1.close()
 
-    # Get the total number of BTC
-    btc_total = btc_mined()
-
     # Save the responses to variables
     chain = str(j1['result']['chain'])
     blocks = int(j1['result']['blocks'])
@@ -178,7 +163,6 @@ def build_table2() -> str:
         [
             ["Chain", chain],
             ["Block number", blocks],
-            ["BTC in existence", btc_total],
             ["Initial block download?", initial],
             ["Difficulty", difficulty],
             ["Verification", verificationprogress],
@@ -255,7 +239,7 @@ app = Flask(__name__)
 
 @app.route("/")
 def index():
-    return render_template("index.html", table1=build_table1(), table2=build_table2(), table3=build_table3(), version=version, currency=currency, price=price_check(currency), refresh=refresh_time())
+    return render_template("index.html", table1=build_table1(), table2=build_table2(), table3=build_table3(), version=version, currency=currency, price=price_check(currency), refresh=refresh_time(), title=page_title)
 
 
 if __name__ == "__main__":
