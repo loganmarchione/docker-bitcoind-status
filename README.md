@@ -15,7 +15,7 @@ Uses Bitcoin's RPC interface to get node data and display it in a Python Flask a
 
 ## Explanation
 
-  - I was looking for a way to monitor my Bitcoin node from my phone, without needing to log in and tail the log files. Products like [mempool.space](https://github.com/mempool/mempool) would work, but were too heavy for what I needed.
+  - I was looking for a way to monitor my Bitcoin node from my phone, without needing to log in and tail the log files. Products like [mempool.space](https://github.com/mempool/mempool) would work, but were too heavy for what I needed. I'm also not looking to replace [Clark Moody's dashboard](https://bitcoin.clarkmoody.com/dashboard/), since this is supposed to be about statistics on a single node.
   - This project was heavily inspired by [this script](https://github.com/mameier/bitcoind-status-bash), but implemented (rather poorly) in Python, runs in Docker, and uses Bitcoin's RPC interface (to connect to remote nodes).
   - All data is obtained from your node, **except** price data (which comes from Coinbase). CSS and icons are from external sources.
   - ⚠️ Bitcoin's RPC connection is not encrypted via SSL ([as-of v0.12.0](https://github.com/bitcoin/bitcoin/blob/master/doc/release-notes/release-notes-0.12.0.md#rpc-ssl-support-dropped)), so do **NOT** use this over the public internet ⚠️
@@ -40,7 +40,7 @@ Uses Bitcoin's RPC interface to get node data and display it in a Python Flask a
 | RPC_USER       | Yes                           | RPC username                          | satoshi                                     |                                                    |
 | RPC_PASS       | Yes                           | RPC password                          | Bitc0inIsGreat1                             |                                                    |
 | CURRENCY       | No (default: USD)             | Three-character currency code         | USD                                         | `https://api.coinbase.com/v2/currencies`           |
-| PAGE_TITLE     | No (default: Bitcoind status) | HTML `<title>` tag                    | "Bitcoin is great"                          | Must be in quotes                                  |
+| PAGE_TITLE     | No (default: Bitcoind status) | HTML `<title>` tag                    | Bitcoin is great                            |                                                    |
 
 ### Ports
 | Port on host              | Port in container | Comments              |
@@ -64,7 +64,7 @@ services:
       - RPC_USER=satoshi
       - RPC_PASS=Bitc0inIsGreat1
       - CURRENCY=USD
-      - PAGE_TITLE="Bitcoin is great"
+      - PAGE_TITLE=Bitcoin is great
     networks:
       - bitcoin
     ports:
@@ -87,3 +87,4 @@ networks:
 - [x] ~~Add price check~~
 - [ ] Add better exception handling to price check
 - [ ] Find a way to get total number of BTC mined (`gettxoutsetinfo`) was too slow
+- [ ] Add favicon
