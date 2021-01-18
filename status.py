@@ -54,6 +54,22 @@ def price_check(c: str) -> int:
         return e
 
 
+def hash_to_hash(h: int) -> float:
+    '''
+    Takes in hash rate, returns converted hash rate 
+
+    Parameters:
+        h (int):    Hash rate per second
+
+    Returns:
+        float       Converted hash rate per second
+    '''
+
+    #        kilo   mega   giga   tera   peta   exa
+    x = (h / 1000 / 1000 / 1000 / 1000 / 1000 / 1000)
+    return x
+
+
 def conn_check():
     '''Takes no input, just runs the connection check, exit if fail'''
 
@@ -76,19 +92,27 @@ def build_table1() -> str:
     # RPC calls to get info
     headers = {'content-type': 'text/plain'}
     payload1 = json.dumps({"jsonrpc": "1.0", "id": "curltest", "method": "getnetworkinfo", "params": []})
-    r1 = requests.post(connection_string, data=payload1, auth=(rpc_user, rpc_pass), headers=headers).json()
+    r1 = requests.post(connection_string, data=payload1, auth=(rpc_user, rpc_pass), headers=headers)
+    j1 = r1.json()
+    r1.close()
+
     payload2 = json.dumps({"jsonrpc": "1.0", "id": "curltest", "method": "uptime", "params": []})
-    r2 = requests.post(connection_string, data=payload2, auth=(rpc_user, rpc_pass), headers=headers).json()
+    r2 = requests.post(connection_string, data=payload2, auth=(rpc_user, rpc_pass), headers=headers)
+    j2 = r2.json()
+    r2.close()
+
     payload3 = json.dumps({"jsonrpc": "1.0", "id": "curltest", "method": "getmemoryinfo", "params": ["stats"]})
-    r3 = requests.post(connection_string, data=payload3, auth=(rpc_user, rpc_pass), headers=headers).json()
+    r3 = requests.post(connection_string, data=payload3, auth=(rpc_user, rpc_pass), headers=headers)
+    j3 = r3.json()
+    r3.close()
 
     # Save the responses to variables
-    subversion = str(r1['result']['subversion'])
-    connections = int(r1['result']['connections'])
-    uptime = int(r2['result'])
-    mem_used = int(r3['result']['locked']['used'])
-    mem_free = int(r3['result']['locked']['free'])  # noqa: F841
-    mem_total = int(r3['result']['locked']['total'])
+    subversion = str(j1['result']['subversion'])
+    connections = int(j1['result']['connections'])
+    uptime = int(j2['result'])
+    mem_used = int(j3['result']['locked']['used'])
+    mem_free = int(j3['result']['locked']['free'])  # noqa: F841
+    mem_total = int(j3['result']['locked']['total'])
     mem_perc = round(((mem_used/mem_total) * 100), 2)
 
     # Here we assemble the table
@@ -117,15 +141,30 @@ def build_table2() -> str:
     # RPC calls to get info
     headers = {'content-type': 'text/plain'}
     payload1 = json.dumps({"jsonrpc": "1.0", "id": "curltest", "method": "getblockchaininfo", "params": []})
-    r1 = requests.post(connection_string, data=payload1, auth=(rpc_user, rpc_pass), headers=headers).json()
+    r1 = requests.post(connection_string, data=payload1, auth=(rpc_user, rpc_pass), headers=headers)
+    j1 = r1.json()
+    r1.close()
+
+    payload2 = json.dumps({"jsonrpc": "1.0", "id": "curltest", "method": "getnetworkhashps", "params": []})
+    r2 = requests.post(connection_string, data=payload2, auth=(rpc_user, rpc_pass), headers=headers)
+    j2 = r2.json()
+    r2.close()
+
+    payload3 = json.dumps({"jsonrpc": "1.0", "id": "curltest", "method": "getnetworkhashps", "params": [-1]})
+    r3 = requests.post(connection_string, data=payload3, auth=(rpc_user, rpc_pass), headers=headers)
+    j3 = r3.json()
+    r3.close()
 
     # Save the responses to variables
-    chain = str(r1['result']['chain'])
-    blocks = int(r1['result']['blocks'])
-    difficulty = float(r1['result']['difficulty'])
-    verificationprogress = float(r1['result']['verificationprogress'])
-    size_on_disk = float(r1['result']['size_on_disk'])
-    pruned = str(r1['result']['pruned'])
+    chain = str(j1['result']['chain'])
+    blocks = int(j1['result']['blocks'])
+    initial = str(j1['result']['initialblockdownload'])
+    difficulty = float(j1['result']['difficulty'])
+    verificationprogress = float(j1['result']['verificationprogress'])
+    size_on_disk = float(j1['result']['size_on_disk'])
+    pruned = str(j1['result']['pruned'])
+    hash_rate = float(j2['result'])
+    hash_rate_last_diff = float(j3['result'])
 
     # Here we assemble the table
     y = PrettyTable()
@@ -135,10 +174,13 @@ def build_table2() -> str:
         [
             ["Chain", chain],
             ["Block number", blocks],
+            ["Initial block download?", initial],
             ["Difficulty", difficulty],
             ["Verification", verificationprogress],
-            ["Size on disk (GB)", round((size_on_disk / 1000 / 1000 / 1000), 2)],
+            ["Size on disk", str(round((size_on_disk / 1000 / 1000 / 1000), 2)) + " GB"],
             ["Is pruned?", pruned],
+            ["Estimated hash rate", str(round(hash_to_hash(hash_rate), 2)) + " EH/s"],
+            ["Estimated hash rate (since last difficulty adjustment)", str(round(hash_to_hash(hash_rate_last_diff), 2)) + " EH/s"] 
         ]
     )
     html = y.get_html_string(attributes={"class": "table is-bordered is-striped is-hoverable is-fullwidth"})
