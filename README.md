@@ -15,7 +15,8 @@ Uses Bitcoin's RPC interface to get node data and display it in a Python Flask a
 
 ## Explanation
 
-  - Heavily inspired by [this script](https://github.com/mameier/bitcoind-status-bash), but implemented (poorly) in Python, runs in Docker, and uses Bitcoin's RPC interface (to connect to remote nodes)
+  - I was looking for a way to monitor my Bitcoin node from my phone, without needing to log in and tail the log files. Products like [mempool.space](https://github.com/mempool/mempool) would work, but were too heavy for what I needed.
+  - This project was heavily inspired by [this script](https://github.com/mameier/bitcoind-status-bash), but implemented (rather poorly) in Python, runs in Docker, and uses Bitcoin's RPC interface (to connect to remote nodes)
   - ⚠️ Bitcoin's RPC connection is not encrypted via SSL ([as-of v0.12.0](https://github.com/bitcoin/bitcoin/blob/master/doc/release-notes/release-notes-0.12.0.md#rpc-ssl-support-dropped)), so do **NOT** use this over the public internet ⚠️
   - ⚠️ I would recomment **NOT** running a wallet on the node you're querying, to minimize chance of loss of funds ⚠️
 
