@@ -56,7 +56,7 @@ def price_check(c: str) -> int:
 
 def hash_to_hash(h: int) -> float:
     '''
-    Takes in hash rate, returns converted hash rate 
+    Takes in hash rate, returns converted hash rate
 
     Parameters:
         h (int):    Hash rate per second
@@ -125,7 +125,7 @@ def build_table1() -> str:
             ["Client version", subversion.strip('/')],
             ["Connections", connections],
             ["Uptime (days, hour:min:sec)", datetime.timedelta(seconds=uptime)],
-            ["Memory (MB)", "Used: " + str(round((mem_used / 1000), 2)) + " of  Total: " + str(round((mem_total / 1000), 2)) + " (" + str(mem_perc) + "% used)"]
+            ["Memory", "Used: " + str(round((mem_used / 1000), 2)) + " MB of  Total: " + str(round((mem_total / 1000), 2)) + " MB (" + str(mem_perc) + "% used)"]
         ]
     )
     html = x.get_html_string(attributes={"class": "table is-bordered is-striped is-hoverable is-fullwidth"})
@@ -180,7 +180,7 @@ def build_table2() -> str:
             ["Size on disk", str(round((size_on_disk / 1000 / 1000 / 1000), 2)) + " GB"],
             ["Is pruned?", pruned],
             ["Estimated hash rate", str(round(hash_to_hash(hash_rate), 2)) + " EH/s"],
-            ["Estimated hash rate (since last difficulty adjustment)", str(round(hash_to_hash(hash_rate_last_diff), 2)) + " EH/s"] 
+            ["Estimated hash rate (since last difficulty adjustment)", str(round(hash_to_hash(hash_rate_last_diff), 2)) + " EH/s"]
         ]
     )
     html = y.get_html_string(attributes={"class": "table is-bordered is-striped is-hoverable is-fullwidth"})
