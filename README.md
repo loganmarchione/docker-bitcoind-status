@@ -33,13 +33,14 @@ Uses Bitcoin's RPC interface to get node data and display it in a Python Flask a
   - `X.X.X`: [Semantic version](https://semver.org/) (use if you want to stick on a specific version)
 
 ### Environment variables
-| Variable       | Required?                  | Definition                                     | Example                                     | Comments                                                                                         |
-|----------------|----------------------------|------------------------------------------------|---------------------------------------------|--------------------------------------------------------------------------------------------------|
-| BITCOIND_HOST  | No (default: localhost)    | Bitcoin node address                           | 'localhost' or your Docker service name     |                                                                                                  |
-| BITCOIND_PORT  | No (default: 8332)         | Bitcoin node                                   | 8332                                        |                                                                                                  |
-| RPC_USER       | Yes                        | RPC username                                   | satoshi                                     |                                                                                                  |
-| RPC_PASS       | Yes                        | RPC password                                   | Bitc0inIsGreat1                             |                                                                                                  |
-| CURRENCY       | No (default: USD)          | Three-digit currency code                      | USD                                         | `https://api.coinbase.com/v2/currencies`                                                         |
+| Variable       | Required?                     | Definition                            | Example                                     | Comments                                           |
+|----------------|-------------------------------|---------------------------------------|---------------------------------------------|----------------------------------------------------|
+| BITCOIND_HOST  | No (default: localhost)       | Bitcoin node address                  | 'localhost' or your Docker service name     |                                                    |
+| BITCOIND_PORT  | No (default: 8332)            | Bitcoin node                          | 8332                                        |                                                    |
+| RPC_USER       | Yes                           | RPC username                          | satoshi                                     |                                                    |
+| RPC_PASS       | Yes                           | RPC password                          | Bitc0inIsGreat1                             |                                                    |
+| CURRENCY       | No (default: USD)             | Three-character currency code         | USD                                         | `https://api.coinbase.com/v2/currencies`           |
+| PAGE_TITLE     | No (default: Bitcoind status) | HTML `<title>` tag                    | "Bitcoin is great"                          | Must be in quotes                                  |
 
 ### Ports
 | Port on host              | Port in container | Comments              |
@@ -63,6 +64,7 @@ services:
       - RPC_USER=satoshi
       - RPC_PASS=Bitc0inIsGreat1
       - CURRENCY=USD
+      - PAGE_TITLE="Bitcoin is great"
     networks:
       - bitcoin
     ports:
@@ -83,4 +85,5 @@ networks:
 - [x] ~~Add second table~~
 - [ ] Find more elegant way to make the RPCs (maybe a function or something?)
 - [x] ~~Add price check~~
-- [ ] Add exception handling to price check
+- [ ] Add better exception handling to price check
+- [ ] Find a way to get total number of BTC mined (`gettxoutsetinfo`) was too slow
