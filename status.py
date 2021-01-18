@@ -2,6 +2,7 @@
 
 import datetime
 import json
+import math
 import os
 import requests
 import socket
@@ -150,7 +151,6 @@ def build_table2() -> str:
     chain = str(j1['result']['chain'])
     blocks = int(j1['result']['blocks'])
     initial = str(j1['result']['initialblockdownload'])
-    difficulty = float(j1['result']['difficulty'])
     verificationprogress = float(j1['result']['verificationprogress'])
     size_on_disk = float(j1['result']['size_on_disk'])
     pruned = str(j1['result']['pruned'])
@@ -164,9 +164,8 @@ def build_table2() -> str:
             ["Chain", chain],
             ["Block number", blocks],
             ["Initial block download?", initial],
-            ["Difficulty", difficulty],
             ["Verification", verificationprogress],
-            ["Size on disk", str(round((size_on_disk / 1000 / 1000 / 1000), 2)) + " GB"],
+            ["Size on disk", str(round((size_on_disk / (1000**3)), 2)) + " GB"],
             ["Is pruned?", pruned]
         ]
     )
@@ -182,7 +181,7 @@ def build_table3() -> str:
 
     # RPC calls to get info
     headers = {'content-type': 'text/plain'}
-    payload1 = json.dumps({"jsonrpc": "1.0", "id": "curltest", "method": "getnetworkhashps", "params": []})
+    payload1 = json.dumps({"jsonrpc": "1.0", "id": "curltest", "method": "getnetworkhashps", "params": [144]})
     r1 = requests.post(connection_string, data=payload1, auth=(rpc_user, rpc_pass), headers=headers)
     j1 = r1.json()
     r1.close()
@@ -192,9 +191,15 @@ def build_table3() -> str:
     j2 = r2.json()
     r2.close()
 
+    payload3 = json.dumps({"jsonrpc": "1.0", "id": "curltest", "method": "getmininginfo", "params": []})
+    r3 = requests.post(connection_string, data=payload3, auth=(rpc_user, rpc_pass), headers=headers)
+    j3 = r3.json()
+    r3.close()
+
     # Save the responses to variables
     hash_rate = float(j1['result'])
     hash_rate_last_diff = float(j2['result'])
+    difficulty = float(j3['result']['difficulty'])
 
     # Here we assemble the table
     x = PrettyTable()
@@ -202,8 +207,45 @@ def build_table3() -> str:
     x.align = "l"
     x.add_rows(
         [
-            ["Estimated hash rate", str(round(hash_to_hash(hash_rate), 2)) + " EH/s"],
-            ["Estimated hash rate (since last difficulty adjustment)", str(round(hash_to_hash(hash_rate_last_diff), 2)) + " EH/s"]
+            ["Estimated hash rate (last 144 blocks or ~1 day)", str(round(hash_to_hash(hash_rate), 2)) + " EH/s"],
+            ["Estimated hash rate (since last difficulty adjustment)", str(round(hash_to_hash(hash_rate_last_diff), 2)) + " EH/s"],
+            ["Difficulty", difficulty]
+        ]
+    )
+    html = x.get_html_string(attributes={"class": "table is-bordered is-striped is-hoverable is-narrow"})
+    return html
+
+
+def build_table4() -> str:
+    '''Takes no input, just builds the table and output HTML'''
+
+    # First, check the connection
+    conn_check()
+
+    # RPC calls to get info
+    headers = {'content-type': 'text/plain'}
+    payload1 = json.dumps({"jsonrpc": "1.0", "id": "curltest", "method": "getmempoolinfo", "params": []})
+    r1 = requests.post(connection_string, data=payload1, auth=(rpc_user, rpc_pass), headers=headers)
+    j1 = r1.json()
+    r1.close()
+
+    # Save the responses to variables
+    mempool_size = int(j1['result']['size'])
+    mempool_bytes = int(j1['result']['bytes'])
+    mempool_usage = int(j1['result']['usage'])
+    mempool_max = int(j1['result']['maxmempool'])
+
+    # Here we assemble the table
+    x = PrettyTable()
+    x.field_names = ["Name", "Value"]
+    x.align = "l"
+    x.add_rows(
+        [
+            ["Size", str(mempool_size) + " txs"],
+            ["vBytes", str(round((mempool_bytes / (1000**2)), 2)) + " MB"],
+            ["Usage", str(round((mempool_usage / (1000**2)), 2)) + " MB"],
+            ["Max", str(round((mempool_max / (1000**2)), 2)) + " MB"],
+            ["Blocks needed to clear", "~" + str(math.trunc(mempool_bytes / (1000**2))) + " blocks"]
         ]
     )
     html = x.get_html_string(attributes={"class": "table is-bordered is-striped is-hoverable is-narrow"})
@@ -239,7 +281,7 @@ app = Flask(__name__)
 
 @app.route("/")
 def index():
-    return render_template("index.html", table1=build_table1(), table2=build_table2(), table3=build_table3(), version=version, currency=currency, price=price_check(currency), refresh=refresh_time(), title=page_title)
+    return render_template("index.html", table1=build_table1(), table2=build_table2(), table3=build_table3(), table4=build_table4(), version=version, currency=currency, price=price_check(currency), refresh=refresh_time(), title=page_title)
 
 
 if __name__ == "__main__":
