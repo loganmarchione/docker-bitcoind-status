@@ -129,7 +129,7 @@ def build_table1() -> str:
             ["Memory", "Used: " + str(round((mem_used / 1000), 2)) + " MB of  Total: " + str(round((mem_total / 1000), 2)) + " MB (" + str(mem_perc) + "% used)"]
         ]
     )
-    html = x.get_html_string(attributes={"class": "table is-bordered is-striped is-hoverable"})
+    html = x.get_html_string(attributes={"class": "table is-bordered is-striped is-hoverable is-narrow"})
     return html
 
 
@@ -170,7 +170,7 @@ def build_table2() -> str:
             ["Is pruned?", pruned]
         ]
     )
-    html = x.get_html_string(attributes={"class": "table is-bordered is-striped is-hoverable"})
+    html = x.get_html_string(attributes={"class": "table is-bordered is-striped is-hoverable is-narrow"})
     return html
 
 
@@ -206,7 +206,7 @@ def build_table3() -> str:
             ["Estimated hash rate (since last difficulty adjustment)", str(round(hash_to_hash(hash_rate_last_diff), 2)) + " EH/s"]
         ]
     )
-    html = x.get_html_string(attributes={"class": "table is-bordered is-striped is-hoverable"})
+    html = x.get_html_string(attributes={"class": "table is-bordered is-striped is-hoverable is-narrow"})
     return html
 
 
