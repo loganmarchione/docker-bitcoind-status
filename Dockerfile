@@ -28,3 +28,5 @@ RUN pip3 install -r requirements.txt
 EXPOSE 5000
 
 CMD ["python", "-u", "./status.py"]
+
+HEALTHCHECK CMD nc -z localhost 5000 || exit 1
