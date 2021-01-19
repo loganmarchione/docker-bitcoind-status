@@ -3,6 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" href="{{ url_for('static', filename = 'bitcoin_logo.svg') }}">
     <title>{{ page_title }}</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@creativebulma/bulma-tooltip@1.2.0/dist/bulma-tooltip.min.css"> 
@@ -15,7 +16,7 @@
       <div class="container">
         <div class="navbar-brand">
           <a class="navbar-item" href="#">
-          ₿itcoind status page
+            <img src="{{ url_for('static', filename = 'bitcoin_logo.svg') }}" width="32" height="32"> ₿itcoind status page
           </a>
         </div>
       </div><!-- end of container -->
@@ -40,7 +41,7 @@
                 </thead>
                 <tbody>
                   <tr>
-                    <td>Node address</td>
+                    <td>Address</td>
                     <td class="table-values">{{ connection_string }}</td>
                   </tr>
                   <tr>
@@ -53,11 +54,11 @@
                   </tr>
                   <tr>
                     <td>Uptime</td>
-                    <td class="table-values"><span class="has-tooltip-right" data-tooltip="(days, hour:min:sec)">{{ uptime }}</span></td>
+                    <td class="table-values"><span class="has-tooltip-right" data-tooltip="(days, hour:min:sec)">{{ uptime_pretty }}</span></td>
                   </tr>
                   <tr>
                     <td>Memory</td>
-                    <td class="table-values">Used: {{ mem_used }} MB of  Total: {{ mem_total }} MB ({{ mem_perc }}% used)</td>
+                    <td class="table-values"><span class="has-tooltip-right has-tooltipl-multiline" data-tooltip="Used: {{ mem_used_pretty }} MB&#10;Total: {{ mem_total_pretty }} MB">{{ mem_perc_pretty }}% used</span></td>
                   </tr>
                 </tbody>
               </table>
@@ -77,12 +78,20 @@
                 </thead>
                 <tbody>
                   <tr>
-                    <td><span class="has-tooltip-right has-tooltipl-multiline" data-tooltip="Price data from Coinbase's API:&#10; https://api.coinbase.com/v2/prices/:currency_pair/spot">Price</span></td>
-                    <td class="table-values">{{ price }} {{ currency }}</td>
+                    <td><span class="has-tooltip-right" data-tooltip="Data from Coinbase's API">Price</span></td>
+                    <td class="table-values">{{ price_pretty }} {{ currency }}</td>
                   </tr>
                   <tr>
-                    <td>Sats/unit currency</td>
-                    <td class="table-values">{{ sats_per_currency }}</td>
+                    <td>Sats/{{ currency }}</td>
+                    <td class="table-values">{{ sats_per_currency_pretty }}</td>
+                  </tr>
+                  <tr>
+                    <td><span class="has-tooltip-right" data-tooltip="Data from Blockchain.com's API">Total supply</span></td>
+                    <td class="table-values">{{ supply_pretty }} BTC</td>
+                  </tr>
+                  <tr>
+                    <td>Market Cap</td>
+                    <td class="table-values">{{ market_cap_pretty }}</td>
                   </tr>
                 </tbody>
               </table>
@@ -107,8 +116,16 @@
                 <td class="table-values">{{ chain }}</td>
               </tr>
               <tr>
-                <td>Block number</td>
-                <td class="table-values">{{ blocks }}</td>
+                <td>Block height</td>
+                <td class="table-values">{{ blocks_pretty }}</td>
+              </tr>
+              <tr>
+                <td>Block hash</td>
+                <td class="table-values"><span class="has-tooltip-right" data-tooltip="For block {{ blocks_pretty }}">{{ blockhash }}</span></td>
+              </tr>
+              <tr>
+                <td>Block reward</td>
+                <td class="table-values"><span class="has-tooltip-right" data-tooltip="For block {{ blocks_pretty }}">{{ subsidy_pretty }} BTC</span></td>
               </tr>
               <tr>
                 <td>Initial block download?</td>
@@ -120,7 +137,7 @@
               </tr>
               <tr>
                 <td>Size on disk</td>
-                <td class="table-values">{{ size_on_disk }} GB</td>
+                <td class="table-values">{{ size_on_disk_pretty }} GB</td>
               </tr>
               <tr>
                 <td>Pruned?</td>                                                                                                                       
@@ -143,15 +160,15 @@
             <tbody>
               <tr>
                 <td>Estimated hash rate (last 144 blocks or ~1 day)</td>
-                <td class="table-values">{{ hash_rate_1_day }} EH/s</td>
+                <td class="table-values">{{ hash_rate_1_day_pretty }} EH/s</td>
               </tr>
               <tr>
                 <td>Estimated hash rate (since last difficulty adjustment)</td>
-                <td class="table-values">{{ hash_rate_last_diff }} EH/s</td>
+                <td class="table-values">{{ hash_rate_last_diff_pretty }} EH/s</td>
               </tr>
               <tr>
                 <td>Difficulty</td>
-                <td class="table-values">{{ difficulty }}</td>
+                <td class="table-values">{{ difficulty_pretty }}</td>
               </tr>
             </tbody>
           </table>
@@ -170,23 +187,23 @@
             <tbody>
               <tr>
                 <td>Size</td>
-                <td class="table-values">{{ mempool_size }} txs</td>
+                <td class="table-values">{{ mempool_size_pretty }} txs</td>
               </tr>
               <tr>
                 <td>vBytes</td>
-                <td class="table-values">{{ mempool_bytes }} MB</td>
+                <td class="table-values">{{ mempool_bytes_pretty }} MB</td>
               </tr>
               <tr>
                 <td>Usage</td>
-                <td class="table-values">{{ mempool_usage }} MB</td>
+                <td class="table-values">{{ mempool_usage_pretty }} MB</td>
               </tr>
               <tr>
                 <td>Max</td>
-                <td class="table-values">{{ mempool_max }} MB</td>
+                <td class="table-values">{{ mempool_max_pretty }} MB</td>
               </tr> 
               <tr>
                 <td>Blocks needed to clear</td>
-                <td class="table-values">{{ mempool_blocks_to_clear }} ~blocks</td>
+                <td class="table-values">~{{ mempool_blocks_to_clear }} blocks</td>
               </tr> 
             </tbody>
           </table>
@@ -202,7 +219,7 @@
         <br></br>
         CSS by <a href="https://bulma.io"><img height="16" width="16" src="https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/bulma.svg"/> Bulma.io</a>.
         Icons by <a href="https://simpleicons.org"><img height="16" width="16" src="https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/simpleicons.svg"/> Simple Icons</a>.
-        Price information by <a href="https://coinbase.com"><img height="16" width="16" src="https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/coinbase.svg"/> Coinbase</a>.
+        External information by <a href="https://coinbase.com"><img height="16" width="16" src="https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/coinbase.svg"/> Coinbase</a> and <a href="https://blockchain.com"> Blockchain.com</a>.
         <br></br>
         Data last refreshed at: {{ refresh }} (UTC)
       </p>
