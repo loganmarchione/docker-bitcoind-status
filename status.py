@@ -7,7 +7,7 @@ import os
 import requests
 import socket
 import sys
-from flask import Flask, render_template
+from flask import Flask, render_template, url_for
 
 # Variables
 bitcoind_host = os.getenv("BITCOIND_HOST", "localhost")
@@ -47,11 +47,27 @@ def price_check(c: str) -> float:
     try:
         print("STATE: Running price check", url)
         r = requests.get(url).json()
-        price = r['data']['amount']
-        return price
+        x = r['data']['amount']
+        return x
     except requests.exceptions.ConnectionError as err:
         print("ERROR: Price check error", err)
-        e = "Price error"
+        e = "Price check error"
+        return e
+
+
+def supply_check() -> int:
+    '''Takes no input, just return the total supply of Bitcoin in satoshis'''
+
+    url = "https://api.blockchain.info/stats"
+
+    try:
+        print("STATE: Running supply check", url)
+        r = requests.get(url).json()
+        x = r['totalbc']
+        return x
+    except requests.exceptions.ConnectionError as err:
+        print("ERROR: Price check error", err)
+        e = "Supply check error"
         return e
 
 
@@ -135,14 +151,17 @@ def index():
     j2 = r2.json()
     r2.close()
     uptime = int(j2['result'])
+    uptime_pretty = str(datetime.timedelta(seconds=uptime))
 
     payload3 = json.dumps({"jsonrpc": "1.0", "id": "curltest", "method": "getmemoryinfo", "params": ["stats"]})
     r3 = requests.post(connection_string, data=payload3, auth=(rpc_user, rpc_pass), headers=headers)
     j3 = r3.json()
     r3.close()
     mem_used = int(j3['result']['locked']['used'])
-    mem_free = int(j3['result']['locked']['free'])  # noqa: F841
+    mem_used_pretty = float(round((mem_used / 1000), 2))
     mem_total = int(j3['result']['locked']['total'])
+    mem_total_pretty = float(round((mem_total / 1000), 2))
+    mem_perc_pretty = float(round(((mem_used/mem_total) * 100), 2))
 
     payload4 = json.dumps({"jsonrpc": "1.0", "id": "curltest", "method": "getblockchaininfo", "params": []})
     r4 = requests.post(connection_string, data=payload4, auth=(rpc_user, rpc_pass), headers=headers)
@@ -150,9 +169,11 @@ def index():
     r4.close()
     chain = str(j4['result']['chain'])
     blocks = int(j4['result']['blocks'])
+    blocks_pretty = str("{:,}".format(blocks))
     initial = str(j4['result']['initialblockdownload'])
     verificationprogress = float(j4['result']['verificationprogress'])
     size_on_disk = float(j4['result']['size_on_disk'])
+    size_on_disk_pretty = float(round((size_on_disk / (1000**3)), 2))
     pruned = str(j4['result']['pruned'])
 
     payload5 = json.dumps({"jsonrpc": "1.0", "id": "curltest", "method": "getnetworkhashps", "params": [144]})
@@ -160,43 +181,54 @@ def index():
     j5 = r5.json()
     r5.close()
     hash_rate_1_day = float(j5['result'])
+    hash_rate_1_day_pretty = float(round(hash_to_hash(hash_rate_1_day), 2))
 
     payload6 = json.dumps({"jsonrpc": "1.0", "id": "curltest", "method": "getnetworkhashps", "params": [-1]})
     r6 = requests.post(connection_string, data=payload6, auth=(rpc_user, rpc_pass), headers=headers)
     j6 = r6.json()
     r6.close()
     hash_rate_last_diff = float(j6['result'])
+    hash_rate_last_diff_pretty = float(round(hash_to_hash(hash_rate_last_diff), 2))
 
     payload7 = json.dumps({"jsonrpc": "1.0", "id": "curltest", "method": "getmininginfo", "params": []})
     r7 = requests.post(connection_string, data=payload7, auth=(rpc_user, rpc_pass), headers=headers)
     j7 = r7.json()
     r7.close()
     difficulty = float(j7['result']['difficulty'])
+    difficulty_pretty = str("{:,}".format(difficulty))
 
     payload8 = json.dumps({"jsonrpc": "1.0", "id": "curltest", "method": "getmempoolinfo", "params": []})
     r8 = requests.post(connection_string, data=payload8, auth=(rpc_user, rpc_pass), headers=headers)
     j8 = r8.json()
     r8.close()
     mempool_size = int(j8['result']['size'])
+    mempool_size_pretty = str("{:,}".format(mempool_size))
     mempool_bytes = int(j8['result']['bytes'])
+    mempool_bytes_pretty = float(round((mempool_bytes / (1000**2)), 2))
     mempool_usage = int(j8['result']['usage'])
+    mempool_usage_pretty = float(round((mempool_usage / (1000**2)), 2))
     mempool_max = int(j8['result']['maxmempool'])
+    mempool_max_pretty = float(round((mempool_max / (1000**2)), 2))
+    mempool_blocks_to_clear = int(math.trunc(mempool_bytes / (1000**2)))
+
+    payload9 = json.dumps({"jsonrpc": "1.0", "id": "curltest", "method": "getblockstats", "params": [blocks]})
+    r9 = requests.post(connection_string, data=payload9, auth=(rpc_user, rpc_pass), headers=headers)
+    j9 = r9.json()
+    r9.close()
+    subsidy = int(j9['result']['subsidy'])
+    subsidy_pretty = float(subsidy / 100000000)
+    blockhash = str(j9['result']['blockhash'])
 
     # Values that need to be converted to look pretty on the HTML page
-    uptime = str(datetime.timedelta(seconds=uptime))
-    mem_perc = str(round(((mem_used/mem_total) * 100), 2))
-    mem_used = str(round((mem_used / 1000), 2))
-    mem_total = str(round((mem_total / 1000), 2))
-    size_on_disk = str(round((size_on_disk / (1000**3)), 2))
-    hash_rate_1_day = str(round(hash_to_hash(hash_rate_1_day), 2))
-    hash_rate_last_diff = str(round(hash_to_hash(hash_rate_last_diff), 2))
-    mempool_blocks_to_clear = str(math.trunc(mempool_bytes / (1000**2)))
-    mempool_bytes = str(round((mempool_bytes / (1000**2)), 2))
-    mempool_usage = str(round((mempool_usage / (1000**2)), 2))
-    mempool_max = str(round((mempool_max / (1000**2)), 2))
-
     price = float(price_check(currency))
+    price_pretty = str("{:,}".format(price))
     sats_per_currency = int(math.trunc((100000000 / price)))
+    sats_per_currency_pretty = str("{:,}".format(sats_per_currency))
+    supply_sats = int(supply_check())
+    supply_btc = float(supply_sats / 100000000)
+    supply_pretty = str("{:,}".format(supply_btc))
+    market_cap = float(price * supply_btc)
+    market_cap_pretty = str("{:,}".format(round(market_cap, 2)))
 
     return render_template("index.html",
                            **locals(),
