@@ -195,7 +195,7 @@ def index():
     mempool_usage = str(round((mempool_usage / (1000**2)), 2))
     mempool_max = str(round((mempool_max / (1000**2)), 2))
 
-    price=float(price_check(currency))
+    price = float(price_check(currency))
     sats_per_currency = int(math.trunc((100000000 / price)))
 
     return render_template("index.html",
