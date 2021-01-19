@@ -22,6 +22,8 @@ COPY status.py .
 COPY VERSION .
 
 COPY templates templates/
+ 
+COPY static static/
 
 RUN pip3 install -r requirements.txt
 
