@@ -15,15 +15,7 @@ USER status
 
 WORKDIR /usr/scr/app
 
-COPY requirements.txt .
-
-COPY status.py .
-
-COPY VERSION .
-
-COPY templates templates/
- 
-COPY static static/
+COPY . .
 
 RUN pip3 install -r requirements.txt
 

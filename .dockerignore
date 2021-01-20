@@ -1,8 +1,11 @@
 .dockerignore
 *.md
-!README.md
 *.env
 .git
+.github
+.gitignore
 .drone.yml
 .travis.yml
 docker-compose.yml
+Dockerfile
+screenshots
