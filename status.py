@@ -218,6 +218,8 @@ def index():
     subsidy = int(j9['result']['subsidy'])
     subsidy_pretty = float(subsidy / 100000000)
     blockhash = str(j9['result']['blockhash'])
+    block_size_bytes = int(j9['result']['total_size'])
+    block_size_bytes_pretty = float(round((block_size_bytes / (1000**2)), 2))
 
     # Values that need to be converted to look pretty on the HTML page
     price = float(price_check(currency))
