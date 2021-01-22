@@ -54,7 +54,7 @@ Uses Bitcoin's RPC interface to get node data and display it in a Python Flask a
 N/A
 
 ### Example usage
-Below is an example docker-compose.yml file.
+Below is an example `docker-compose.yml` file. Page will be available **only** over HTTPS at `https://YOUR_IP_ADDRESS:PORT_YOU_CHOSE` (there will be a self-signed certificate from Flask).
 ```
 version: '3'
 services:
@@ -91,3 +91,5 @@ networks:
 - [ ] Add better exception handling to price check
 - [ ] Find a way to get total number of BTC mined (`gettxoutsetinfo`) was too slow
 - [x] ~~Add favicon~~
+- [x] ~~Add SSL support~~
+- [x] ~~Switch to Ubuntu-based Python image (needed for SSL support)~~
