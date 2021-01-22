@@ -7,7 +7,7 @@
 Uses Bitcoin's RPC interface to get node data and display it in a Python Flask application
   - Source code: [GitHub](https://github.com/loganmarchione/docker-bitcoind-status)
   - Docker container: [Docker Hub](https://hub.docker.com/r/loganmarchione/docker-bitcoind-status)
-  - Image base: [Python (Alpine)](https://hub.docker.com/_/python)
+  - Image base: [Python (slim Buster)](https://hub.docker.com/_/python)
   - Init system: N/A
   - Application: N/A
 
