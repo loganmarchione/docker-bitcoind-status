@@ -172,6 +172,7 @@ def index():
     blocks_pretty = str("{:,}".format(blocks))
     initial = str(j4['result']['initialblockdownload'])
     verificationprogress = float(j4['result']['verificationprogress'])
+    verificationprogress_pretty = float(round((verificationprogress * 100), 3))
     size_on_disk = float(j4['result']['size_on_disk'])
     size_on_disk_pretty = float(round((size_on_disk / (1000**3)), 2))
     pruned = str(j4['result']['pruned'])
@@ -224,6 +225,8 @@ def index():
     # Values that need to be converted to look pretty on the HTML page
     price = float(price_check(currency))
     price_pretty = str("{:,}".format(price))
+    subsidy_curr = float(subsidy_pretty * price)
+    subsidy_curr_pretty = str("{:,}".format(subsidy_curr))
     sats_per_currency = int(math.trunc((100000000 / price)))
     sats_per_currency_pretty = str("{:,}".format(sats_per_currency))
     supply_sats = int(supply_check())
