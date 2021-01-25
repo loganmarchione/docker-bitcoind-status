@@ -71,19 +71,25 @@ def supply_check() -> int:
         return e
 
 
-def hash_to_hash(h: int) -> float:
+def metric_converter(v: int, s: int) -> float:
     '''
-    Takes in hash rate, returns converted hash rate
+    Takes in metric value and exponent, returns converted value
 
     Parameters:
-        h (int):    Hash rate per second
+        v (int):    Value (e.g., bytes)
+        s (int):    Exponent (10**s)
 
     Returns:
-        float       Converted hash rate per second
+        float       Converted value
     '''
 
-    #        kilo   mega   giga   tera   peta   exa
-    x = (h / 1000 / 1000 / 1000 / 1000 / 1000 / 1000)
+    # 10**3 = kilo
+    # 10**6 = mega
+    # 10**9 = giga
+    # 10**12 = tera
+    # 10**15 = peta
+    # 10**18 = exa
+    x = (v / 10**s)
     return x
 
 
@@ -94,9 +100,9 @@ def conn_check():
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     q = s.connect_ex((bitcoind_host, bitcoind_port))
     if q == 0:
-        print("STATE: Connection is OK")
+        print("STATE: Connection to node is OK")
     else:
-        print("ERROR: Connection is NOT OK, check host/port, exiting")
+        print("ERROR: Connection to node is NOT OK, check host/port, exiting")
         sys.exit(1)
 
 
@@ -133,6 +139,10 @@ def index():
     # First, check the connection
     conn_check()
 
+    # Check the price
+    price = float(price_check(currency))
+    price_pretty = str("{:,}".format(price))
+
     # Headers
     headers = {'content-type': 'text/plain'}
 
@@ -151,17 +161,17 @@ def index():
     j2 = r2.json()
     r2.close()
     uptime = int(j2['result'])
-    uptime_pretty = str(datetime.timedelta(seconds=uptime))
+    uptime_pretty = datetime.timedelta(seconds=uptime)
 
     payload3 = json.dumps({"jsonrpc": "1.0", "id": "curltest", "method": "getmemoryinfo", "params": ["stats"]})
     r3 = requests.post(connection_string, data=payload3, auth=(rpc_user, rpc_pass), headers=headers)
     j3 = r3.json()
     r3.close()
     mem_used = int(j3['result']['locked']['used'])
-    mem_used_pretty = float(round((mem_used / 1000), 2))
+    mem_used_pretty = round(metric_converter(mem_used, 6), 2)
     mem_total = int(j3['result']['locked']['total'])
-    mem_total_pretty = float(round((mem_total / 1000), 2))
-    mem_perc_pretty = float(round(((mem_used/mem_total) * 100), 2))
+    mem_total_pretty = round(metric_converter(mem_total ,6), 2)
+    mem_perc_pretty = round(((mem_used / mem_total) * 100), 2)
 
     payload4 = json.dumps({"jsonrpc": "1.0", "id": "curltest", "method": "getblockchaininfo", "params": []})
     r4 = requests.post(connection_string, data=payload4, auth=(rpc_user, rpc_pass), headers=headers)
@@ -172,9 +182,9 @@ def index():
     blocks_pretty = str("{:,}".format(blocks))
     initial = str(j4['result']['initialblockdownload'])
     verificationprogress = float(j4['result']['verificationprogress'])
-    verificationprogress_pretty = float(round((verificationprogress * 100), 3))
+    verificationprogress_pretty = round((verificationprogress * 100), 3)
     size_on_disk = float(j4['result']['size_on_disk'])
-    size_on_disk_pretty = float(round((size_on_disk / (1000**3)), 2))
+    size_on_disk_pretty = round(metric_converter(size_on_disk, 9), 2)
     pruned = str(j4['result']['pruned'])
 
     payload5 = json.dumps({"jsonrpc": "1.0", "id": "curltest", "method": "getnetworkhashps", "params": [144]})
@@ -182,14 +192,14 @@ def index():
     j5 = r5.json()
     r5.close()
     hash_rate_1_day = float(j5['result'])
-    hash_rate_1_day_pretty = float(round(hash_to_hash(hash_rate_1_day), 2))
+    hash_rate_1_day_pretty = round(metric_converter(hash_rate_1_day, 18), 2)
 
     payload6 = json.dumps({"jsonrpc": "1.0", "id": "curltest", "method": "getnetworkhashps", "params": [-1]})
     r6 = requests.post(connection_string, data=payload6, auth=(rpc_user, rpc_pass), headers=headers)
     j6 = r6.json()
     r6.close()
     hash_rate_last_diff = float(j6['result'])
-    hash_rate_last_diff_pretty = float(round(hash_to_hash(hash_rate_last_diff), 2))
+    hash_rate_last_diff_pretty = round(metric_converter(hash_rate_last_diff, 18), 2)
 
     payload7 = json.dumps({"jsonrpc": "1.0", "id": "curltest", "method": "getmininginfo", "params": []})
     r7 = requests.post(connection_string, data=payload7, auth=(rpc_user, rpc_pass), headers=headers)
@@ -205,28 +215,26 @@ def index():
     mempool_size = int(j8['result']['size'])
     mempool_size_pretty = str("{:,}".format(mempool_size))
     mempool_bytes = int(j8['result']['bytes'])
-    mempool_bytes_pretty = float(round((mempool_bytes / (1000**2)), 2))
+    mempool_bytes_pretty = round(metric_converter(mempool_bytes, 6), 2)
     mempool_usage = int(j8['result']['usage'])
-    mempool_usage_pretty = float(round((mempool_usage / (1000**2)), 2))
+    mempool_usage_pretty = round(metric_converter(mempool_usage, 6), 2)
     mempool_max = int(j8['result']['maxmempool'])
-    mempool_max_pretty = float(round((mempool_max / (1000**2)), 2))
-    mempool_blocks_to_clear = int(math.trunc(mempool_bytes / (1000**2)))
+    mempool_max_pretty = round(metric_converter(mempool_max, 6), 2)
+    mempool_blocks_to_clear = int(math.trunc(metric_converter(mempool_bytes, 6)))
 
     payload9 = json.dumps({"jsonrpc": "1.0", "id": "curltest", "method": "getblockstats", "params": [blocks]})
     r9 = requests.post(connection_string, data=payload9, auth=(rpc_user, rpc_pass), headers=headers)
     j9 = r9.json()
     r9.close()
     subsidy = int(j9['result']['subsidy'])
-    subsidy_pretty = float(subsidy / 100000000)
+    subsidy_pretty = (subsidy / 100000000)
+    subsidy_currency = float(subsidy * price)
+    subsidy_currency_pretty = str("{:,}".format(subsidy_currency / 100000000))
     blockhash = str(j9['result']['blockhash'])
     block_size_bytes = int(j9['result']['total_size'])
-    block_size_bytes_pretty = float(round((block_size_bytes / (1000**2)), 2))
+    block_size_bytes_pretty = round(metric_converter(block_size_bytes, 6), 2)
 
     # Values that need to be converted to look pretty on the HTML page
-    price = float(price_check(currency))
-    price_pretty = str("{:,}".format(price))
-    subsidy_curr = float(subsidy_pretty * price)
-    subsidy_curr_pretty = str("{:,}".format(subsidy_curr))
     sats_per_currency = int(math.trunc((100000000 / price)))
     sats_per_currency_pretty = str("{:,}".format(sats_per_currency))
     supply_sats = int(supply_check())
