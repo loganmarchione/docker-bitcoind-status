@@ -2,7 +2,6 @@
 
 import datetime
 import json
-import math
 import os
 import requests
 import socket
@@ -220,7 +219,7 @@ def index():
     mempool_usage_pretty = round(metric_converter(mempool_usage, 6), 2)
     mempool_max = int(j8['result']['maxmempool'])
     mempool_max_pretty = round(metric_converter(mempool_max, 6), 2)
-    mempool_blocks_to_clear = int(math.trunc(metric_converter(mempool_bytes, 6)))
+    mempool_blocks_to_clear = int(metric_converter(mempool_bytes, 6))
 
     payload9 = json.dumps({"jsonrpc": "1.0", "id": "curltest", "method": "getblockstats", "params": [blocks]})
     r9 = requests.post(connection_string, data=payload9, auth=(rpc_user, rpc_pass), headers=headers)
@@ -234,8 +233,8 @@ def index():
     block_size_bytes = int(j9['result']['total_size'])
     block_size_bytes_pretty = round(metric_converter(block_size_bytes, 6), 2)
 
-    # Values that need to be converted to look pretty on the HTML page
-    sats_per_currency = int(math.trunc((100000000 / price)))
+    # Other random things that need to be calculated, mostly related to price or supply
+    sats_per_currency = int(100000000 / price)
     sats_per_currency_pretty = "{:,}".format(sats_per_currency)
     supply_sats = int(supply_check())
     supply_btc = float(supply_sats / 100000000)
@@ -243,6 +242,7 @@ def index():
     market_cap = float(price * supply_btc)
     market_cap_pretty = "{:,}".format(round(market_cap, 2))
 
+    # Render the page using the template
     return render_template("index.html",
                            **locals(),
                            connection_string=connection_string,
