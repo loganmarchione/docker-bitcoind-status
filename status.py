@@ -141,7 +141,7 @@ def index():
 
     # Check the price
     price = float(price_check(currency))
-    price_pretty = str("{:,}".format(price))
+    price_pretty = "{:,}".format(price)
 
     # Headers
     headers = {'content-type': 'text/plain'}
@@ -179,7 +179,7 @@ def index():
     r4.close()
     chain = str(j4['result']['chain'])
     blocks = int(j4['result']['blocks'])
-    blocks_pretty = str("{:,}".format(blocks))
+    blocks_pretty = "{:,}".format(blocks)
     initial = str(j4['result']['initialblockdownload'])
     verificationprogress = float(j4['result']['verificationprogress'])
     verificationprogress_pretty = round((verificationprogress * 100), 3)
@@ -206,14 +206,14 @@ def index():
     j7 = r7.json()
     r7.close()
     difficulty = float(j7['result']['difficulty'])
-    difficulty_pretty = str("{:,}".format(difficulty))
+    difficulty_pretty = "{:,}".format(difficulty)
 
     payload8 = json.dumps({"jsonrpc": "1.0", "id": "curltest", "method": "getmempoolinfo", "params": []})
     r8 = requests.post(connection_string, data=payload8, auth=(rpc_user, rpc_pass), headers=headers)
     j8 = r8.json()
     r8.close()
     mempool_size = int(j8['result']['size'])
-    mempool_size_pretty = str("{:,}".format(mempool_size))
+    mempool_size_pretty = "{:,}".format(mempool_size)
     mempool_bytes = int(j8['result']['bytes'])
     mempool_bytes_pretty = round(metric_converter(mempool_bytes, 6), 2)
     mempool_usage = int(j8['result']['usage'])
@@ -229,19 +229,19 @@ def index():
     subsidy = int(j9['result']['subsidy'])
     subsidy_pretty = (subsidy / 100000000)
     subsidy_currency = float(subsidy * price)
-    subsidy_currency_pretty = str("{:,}".format(subsidy_currency / 100000000))
+    subsidy_currency_pretty = "{:,}".format(subsidy_currency / 100000000)
     blockhash = str(j9['result']['blockhash'])
     block_size_bytes = int(j9['result']['total_size'])
     block_size_bytes_pretty = round(metric_converter(block_size_bytes, 6), 2)
 
     # Values that need to be converted to look pretty on the HTML page
     sats_per_currency = int(math.trunc((100000000 / price)))
-    sats_per_currency_pretty = str("{:,}".format(sats_per_currency))
+    sats_per_currency_pretty = "{:,}".format(sats_per_currency)
     supply_sats = int(supply_check())
     supply_btc = float(supply_sats / 100000000)
-    supply_pretty = str("{:,}".format(supply_btc))
+    supply_pretty = "{:,}".format(supply_btc)
     market_cap = float(price * supply_btc)
-    market_cap_pretty = str("{:,}".format(round(market_cap, 2)))
+    market_cap_pretty = "{:,}".format(round(market_cap, 2))
 
     return render_template("index.html",
                            **locals(),
