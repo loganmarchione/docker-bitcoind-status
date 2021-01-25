@@ -205,7 +205,7 @@ def index():
     j7 = r7.json()
     r7.close()
     difficulty = float(j7['result']['difficulty'])
-    difficulty_pretty = "{:,}".format(difficulty)
+    difficulty_pretty = round(metric_converter(difficulty, 12), 2)
 
     payload8 = json.dumps({"jsonrpc": "1.0", "id": "curltest", "method": "getmempoolinfo", "params": []})
     r8 = requests.post(connection_string, data=payload8, auth=(rpc_user, rpc_pass), headers=headers)
