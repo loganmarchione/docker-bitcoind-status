@@ -141,7 +141,7 @@ def index():
 
     # Check the price
     price = float(price_check(currency))
-    price_pretty = "{:,}".format(price)
+    price_pretty = '${:,.2f}'.format(price)
 
     # Headers
     headers = {'content-type': 'text/plain'}
@@ -239,9 +239,9 @@ def index():
     sats_per_currency_pretty = "{:,}".format(sats_per_currency)
     supply_sats = int(supply_check())
     supply_btc = float(supply_sats / 100000000)
-    supply_pretty = "{:,}".format(supply_btc)
+    supply_pretty = '${:,.2f}'.format(supply_btc)
     market_cap = float(price * supply_btc)
-    market_cap_pretty = "{:,}".format(round(market_cap, 2))
+    market_cap_pretty = '${:,.2f}'.format(market_cap)
 
     # Render the page using the template
     return render_template("index.html",
