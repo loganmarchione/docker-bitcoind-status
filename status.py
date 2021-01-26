@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 import datetime
-import decimal
 import json
 import os
 import requests
@@ -141,7 +140,7 @@ def index():
 
     # Check the price
     price = float(price_check(currency))
-    price_pretty = '${:,.2f}'.format(price)
+    price_pretty = '{:,.2f}'.format(price)
 
     # Headers
     headers = {'content-type': 'text/plain'}
@@ -168,10 +167,10 @@ def index():
     j3 = r3.json()
     r3.close()
     mem_used = int(j3['result']['locked']['used'])
-    mem_used_pretty = round(metric_converter(mem_used, 3), 2)
+    mem_used_pretty = '{:,.3f}'.format(metric_converter(mem_used, 3))
     mem_total = int(j3['result']['locked']['total'])
-    mem_total_pretty = round(metric_converter(mem_total, 3), 2)
-    mem_perc_pretty = round(((mem_used / mem_total) * 100), 2)
+    mem_total_pretty = '{:,.3f}'.format(metric_converter(mem_total, 3))
+    mem_perc_pretty = '{:,.2f}'.format((mem_used / mem_total) * 100)
 
     payload4 = json.dumps({"jsonrpc": "1.0", "id": "curltest", "method": "getblockchaininfo", "params": []})
     r4 = requests.post(connection_string, data=payload4, auth=(rpc_user, rpc_pass), headers=headers)
@@ -179,12 +178,12 @@ def index():
     r4.close()
     chain = str(j4['result']['chain'])
     blocks = int(j4['result']['blocks'])
-    blocks_pretty = "{:,}".format(blocks)
+    blocks_pretty = '{:,.0f}'.format(blocks)
     initial = str(j4['result']['initialblockdownload'])
     verificationprogress = float(j4['result']['verificationprogress'])
-    verificationprogress_pretty = round((verificationprogress * 100), 3)
+    verificationprogress_pretty = '{:,.2f}'.format(verificationprogress * 100)
     size_on_disk = float(j4['result']['size_on_disk'])
-    size_on_disk_pretty = round(metric_converter(size_on_disk, 9), 2)
+    size_on_disk_pretty = '{:,.2f}'.format(metric_converter(size_on_disk, 9))
     pruned = str(j4['result']['pruned'])
 
     payload5 = json.dumps({"jsonrpc": "1.0", "id": "curltest", "method": "getnetworkhashps", "params": [144]})
@@ -192,56 +191,56 @@ def index():
     j5 = r5.json()
     r5.close()
     hash_rate_1_day = float(j5['result'])
-    hash_rate_1_day_pretty = round(metric_converter(hash_rate_1_day, 18), 2)
+    hash_rate_1_day_pretty = '{:,.2f}'.format(metric_converter(hash_rate_1_day, 18))
 
     payload6 = json.dumps({"jsonrpc": "1.0", "id": "curltest", "method": "getnetworkhashps", "params": [-1]})
     r6 = requests.post(connection_string, data=payload6, auth=(rpc_user, rpc_pass), headers=headers)
     j6 = r6.json()
     r6.close()
     hash_rate_last_diff = float(j6['result'])
-    hash_rate_last_diff_pretty = round(metric_converter(hash_rate_last_diff, 18), 2)
+    hash_rate_last_diff_pretty = '{:,.2f}'.format(metric_converter(hash_rate_last_diff, 18))
 
     payload7 = json.dumps({"jsonrpc": "1.0", "id": "curltest", "method": "getmininginfo", "params": []})
     r7 = requests.post(connection_string, data=payload7, auth=(rpc_user, rpc_pass), headers=headers)
     j7 = r7.json()
     r7.close()
     difficulty = float(j7['result']['difficulty'])
-    difficulty_pretty = round(metric_converter(difficulty, 12), 2)
+    difficulty_pretty = '{:,.2f}'.format(metric_converter(difficulty, 12))
 
     payload8 = json.dumps({"jsonrpc": "1.0", "id": "curltest", "method": "getmempoolinfo", "params": []})
     r8 = requests.post(connection_string, data=payload8, auth=(rpc_user, rpc_pass), headers=headers)
     j8 = r8.json()
     r8.close()
     mempool_size = int(j8['result']['size'])
-    mempool_size_pretty = "{:,}".format(mempool_size)
+    mempool_size_pretty = '{:,.0f}'.format(mempool_size)
     mempool_bytes = int(j8['result']['bytes'])
-    mempool_bytes_pretty = round(metric_converter(mempool_bytes, 6), 2)
+    mempool_bytes_pretty = '{:,.2f}'.format(metric_converter(mempool_bytes, 6))
     mempool_usage = int(j8['result']['usage'])
-    mempool_usage_pretty = round(metric_converter(mempool_usage, 6), 2)
+    mempool_usage_pretty = '{:,.2f}'.format(metric_converter(mempool_usage, 6))
     mempool_max = int(j8['result']['maxmempool'])
-    mempool_max_pretty = round(metric_converter(mempool_max, 6), 2)
-    mempool_blocks_to_clear = int(metric_converter(mempool_bytes, 6))
+    mempool_max_pretty = '{:,.2f}'.format(metric_converter(mempool_max, 6))
+    mempool_blocks_to_clear = '{:,.0f}'.format(metric_converter(mempool_bytes, 6))
 
     payload9 = json.dumps({"jsonrpc": "1.0", "id": "curltest", "method": "getblockstats", "params": [blocks]})
     r9 = requests.post(connection_string, data=payload9, auth=(rpc_user, rpc_pass), headers=headers)
     j9 = r9.json()
     r9.close()
     subsidy = int(j9['result']['subsidy'])
-    subsidy_pretty = (subsidy / 100000000)
+    subsidy_pretty = '{:,.3f}'.format((subsidy / 100000000))
     subsidy_currency = float(subsidy * price)
-    subsidy_currency_pretty = "{:,}".format(subsidy_currency / 100000000)
+    subsidy_currency_pretty = '{:,.2f}'.format(subsidy_currency / 100000000)
     blockhash = str(j9['result']['blockhash'])
     block_size_bytes = int(j9['result']['total_size'])
-    block_size_bytes_pretty = round(metric_converter(block_size_bytes, 6), 2)
+    block_size_bytes_pretty = '{:,.2f}'.format(metric_converter(block_size_bytes, 6))
 
     # Other random things that need to be calculated, mostly related to price or supply
     sats_per_currency = int(100000000 / price)
-    sats_per_currency_pretty = "{:,}".format(sats_per_currency)
+    sats_per_currency_pretty = '{:,.0f}'.format(sats_per_currency)
     supply_sats = int(supply_check())
     supply_btc = float(supply_sats / 100000000)
-    supply_pretty = '${:,.2f}'.format(supply_btc)
+    supply_pretty = '{:,.2f}'.format(supply_btc)
     market_cap = float(price * supply_btc)
-    market_cap_pretty = '${:,.2f}'.format(market_cap)
+    market_cap_pretty = '{:,.2f}'.format(market_cap)
 
     # Render the page using the template
     return render_template("index.html",
