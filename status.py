@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import datetime
+import decimal
 import json
 import os
 import requests
@@ -167,9 +168,9 @@ def index():
     j3 = r3.json()
     r3.close()
     mem_used = int(j3['result']['locked']['used'])
-    mem_used_pretty = round(metric_converter(mem_used, 6), 2)
+    mem_used_pretty = round(metric_converter(mem_used, 3), 2)
     mem_total = int(j3['result']['locked']['total'])
-    mem_total_pretty = round(metric_converter(mem_total, 6), 2)
+    mem_total_pretty = round(metric_converter(mem_total, 3), 2)
     mem_perc_pretty = round(((mem_used / mem_total) * 100), 2)
 
     payload4 = json.dumps({"jsonrpc": "1.0", "id": "curltest", "method": "getblockchaininfo", "params": []})
