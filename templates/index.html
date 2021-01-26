@@ -61,8 +61,8 @@
                     <td class="table-values"><span data-tooltip="(days, hour:min:sec)">{{ uptime_pretty }}</span></td>
                   </tr>
                   <tr>
-                    <td>Memory</td>
-                    <td class="table-values"><span class="has-tooltipl-multiline" data-tooltip="Used: {{ mem_used_pretty }} MB&#10;Total: {{ mem_total_pretty }} MB">{{ mem_perc_pretty }}% used</span></td>
+                    <td><span class="has-tooltip-right has-tooltipl-multiline" data-tooltip="Not swapped to disk&#10;Used to store security-sensitive material">Locked memory</span></td>
+                    <td class="table-values"><span class="has-tooltipl-multiline" data-tooltip="Used: {{ mem_used_pretty }} KB&#10;Total: {{ mem_total_pretty }} KB">{{ mem_perc_pretty }}% used</span></td>
                   </tr>
                 </tbody>
               </table>
@@ -145,7 +145,7 @@
               </tr>
               <tr>
                 <td>Verification</td>
-                <td class="table-values"><span data-tooltip="{{ verificationprogress }}">{{ verificationprogress_pretty }}%</td>
+                <td class="table-values"><span data-tooltip="{{ verificationprogress }}">{{ verificationprogress_pretty }}%</span></td>
               </tr>
               <tr>
                 <td>Size on disk</td>
@@ -172,15 +172,15 @@
             <tbody>
               <tr>
                 <td>Hash rate (<span data-tooltip="144 blocks">~1 day</span>)</td>
-                <td class="table-values"><span data-tooltip="{{ hash_rate_1_day }} H/s">{{ hash_rate_1_day_pretty }} EH/s</td>
+                <td class="table-values"><span data-tooltip="{{ hash_rate_1_day }} H/s">{{ hash_rate_1_day_pretty }} EH/s</span></td>
               </tr>
               <tr>
                 <td>Hash rate (since last difficulty adjustment)</td>
-                <td class="table-values"><span data-tooltip="{{ hash_rate_last_diff }} H/s">{{ hash_rate_last_diff_pretty }} EH/s</td>
+                <td class="table-values"><span data-tooltip="{{ hash_rate_last_diff }} H/s">{{ hash_rate_last_diff_pretty }} EH/s</span></td>
               </tr>
               <tr>
                 <td>Difficulty</td>
-                <td class="table-values"><span data-tooltip="{{ difficulty }}">{{ difficulty_pretty }} T</td>
+                <td class="table-values"><span data-tooltip="{{ difficulty }}">{{ difficulty_pretty }} T</span></td>
               </tr>
             </tbody>
           </table>
