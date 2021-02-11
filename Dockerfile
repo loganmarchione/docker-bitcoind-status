@@ -9,7 +9,10 @@ LABEL \
   org.opencontainers.image.description="Uses Bitcoin's RPC interface to get node data and display it in a Python Flask application" \
   org.opencontainers.image.created=$BUILD_DATE
 
-RUN adduser --system status
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    netcat && \
+    rm -rf /var/lib/apt/lists/* && \
+    adduser --system status
 
 USER status
 
