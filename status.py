@@ -18,6 +18,9 @@ currency = os.getenv("CURRENCY", "USD")
 page_title = os.getenv("PAGE_TITLE", "Bitcoind status")
 start_time = datetime.datetime.utcnow().isoformat()
 
+# Headers
+headers = {'content-type': 'text/plain'}
+
 # Get version file
 with open('VERSION') as f:
     version = f.readline()
@@ -65,7 +68,7 @@ def supply_check() -> int:
         x = r['totalbc']
         return x
     except requests.exceptions.ConnectionError as err:
-        print("ERROR: Price check error", err)
+        print("ERROR: Supply check error", err)
         e = "Supply check error"
         return e
 
@@ -99,9 +102,20 @@ def conn_check():
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     q = s.connect_ex((bitcoind_host, bitcoind_port))
     if q == 0:
-        print("STATE: Connection to node is OK")
+        print("STATE: Node host/port are valid")
     else:
         print("ERROR: Connection to node is NOT OK, check host/port, exiting")
+        sys.exit(1)
+
+
+def auth_check():
+    '''Takes no input, just runs the auth check, exit if fail'''
+
+    print("STATE: Running authorization check on", connection_string)
+    r = requests.post(connection_string, auth=(rpc_user, rpc_pass), headers=headers)
+    print("STATE: HTTP status code is", r.status_code)
+    if r.status_code == 401:
+        print("ERROR: Username/password are NOT OK, exiting")
         sys.exit(1)
 
 
@@ -137,13 +151,15 @@ def index():
 
     # First, check the connection
     conn_check()
+    print("STATE: If you're reading this, conn_check() completed")
+
+    auth_check()
+    print("STATE: If you're reading this, auth_check() completed")
 
     # Check the price
     price = float(price_check(currency))
+    print("STATE: If you're reading this, price_check() completed")
     price_pretty = '{:,.2f}'.format(price)
-
-    # Headers
-    headers = {'content-type': 'text/plain'}
 
     # RPC calls to get info
     payload1 = json.dumps({"jsonrpc": "1.0", "id": "curltest", "method": "getnetworkinfo", "params": []})
@@ -237,6 +253,7 @@ def index():
     sats_per_currency = int(100000000 / price)
     sats_per_currency_pretty = '{:,.0f}'.format(sats_per_currency)
     supply_sats = int(supply_check())
+    print("STATE: If you're reading this, supply_check() completed")
     supply_btc = float(supply_sats / 100000000)
     supply_pretty = '{:,.2f}'.format(supply_btc)
     market_cap = float(price * supply_btc)
