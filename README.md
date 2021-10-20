@@ -2,7 +2,6 @@
 
 ![CI/CD](https://github.com/loganmarchione/docker-bitcoind-status/workflows/CI/CD/badge.svg)
 [![Docker Image Size (latest semver)](https://img.shields.io/docker/image-size/loganmarchione/docker-bitcoind-status)](https://hub.docker.com/r/loganmarchione/docker-bitcoind-status)
-[![MicroBadger Layers](https://img.shields.io/microbadger/layers/loganmarchione/docker-bitcoind-status)](https://microbadger.com/images/loganmarchione/docker-bitcoind-status)
 
 Uses Bitcoin's RPC interface to get node data and display it in a Python Flask application
   - Source code: [GitHub](https://github.com/loganmarchione/docker-bitcoind-status)
