@@ -1,3 +1,10 @@
 general:
   vulnerabilities:
     - CVE-2021-33574  # https://security-tracker.debian.org/tracker/CVE-2021-33574
+    - CVE-2022-23218
+    - CVE-2022-23219
+    - CVE-2022-22822
+    - CVE-2022-22823
+    - CVE-2022-22824
+    - CVE-2022-23852
+    - CVE-2022-23990
