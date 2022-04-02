@@ -1,11 +1,11 @@
-.dockerignore
 *.md
 *.env
 .git
-.github
 .gitignore
+.github
 .drone.yml
 .travis.yml
 docker-compose.yml
 Dockerfile
+.dockerignore
 screenshots
