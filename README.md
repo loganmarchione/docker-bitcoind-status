@@ -9,6 +9,7 @@ Uses Bitcoin's RPC interface to get node data and display it in a Python Flask a
   - Image base: [Python (slim Buster)](https://hub.docker.com/_/python)
   - Init system: N/A
   - Application: N/A
+  - Architecture: `linux/amd64`
 
 ![Screenshot](https://raw.githubusercontent.com/loganmarchione/docker-bitcoind-status/master/screenshots/2021-01-19.png)
 
