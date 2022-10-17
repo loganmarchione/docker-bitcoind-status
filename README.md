@@ -1,11 +1,11 @@
-# docker-bitcoind-status 
+# ⚠️ WARNING ⚠️
 
-[![CI/CD](https://github.com/loganmarchione/docker-bitcoind-status/actions/workflows/main.yml/badge.svg)](https://github.com/loganmarchione/docker-bitcoind-status/actions/workflows/main.yml)
-[![Docker Image Size (latest semver)](https://img.shields.io/docker/image-size/loganmarchione/docker-bitcoind-status)](https://hub.docker.com/r/loganmarchione/docker-bitcoind-status)
+This project relies on an [API that is not reliable](https://github.com/loganmarchione/docker-bitcoind-status/issues/1). As such, I will not be updating this code.
+
+# docker-bitcoind-status
 
 Uses Bitcoin's RPC interface to get node data and display it in a Python Flask application
   - Source code: [GitHub](https://github.com/loganmarchione/docker-bitcoind-status)
-  - Docker container: [Docker Hub](https://hub.docker.com/r/loganmarchione/docker-bitcoind-status)
   - Image base: [Python (slim Buster)](https://hub.docker.com/_/python)
   - Init system: N/A
   - Application: N/A
@@ -22,7 +22,7 @@ Uses Bitcoin's RPC interface to get node data and display it in a Python Flask a
     *  I'm also not looking to replace [Clark Moody's dashboard](https://bitcoin.clarkmoody.com/dashboard/), since this is supposed to be about statistics on a single node
   - This project was heavily inspired by [this script](https://github.com/mameier/bitcoind-status-bash), but implemented (rather poorly) in Python, runs in Docker, and uses Bitcoin's RPC interface (to connect to remote nodes).
   - ⚠️ Bitcoin's RPC connection is not encrypted via SSL ([as-of v0.12.0](https://github.com/bitcoin/bitcoin/blob/master/doc/release-notes/release-notes-0.12.0.md#rpc-ssl-support-dropped)), so do **NOT** use this over the public internet ⚠️
-  - ⚠️ I would recomment **NOT** running a wallet on the node you're querying, to minimize chance of loss of funds ⚠️
+  - ⚠️ I would recommend **NOT** running a wallet on the node you're querying, to minimize chance of loss of funds ⚠️
 
 ## Requirements
 
@@ -30,10 +30,6 @@ Uses Bitcoin's RPC interface to get node data and display it in a Python Flask a
   - Because of the number of RPCs required, you'll need to set `rpcworkqueue=32` (or  higher) in `bitcoin.conf`.
 
 ## Docker image information
-
-### Docker image tags
-  - `latest`: Latest version
-  - `X.X.X`: [Semantic version](https://semver.org/) (use if you want to stick on a specific version)
 
 ### Environment variables
 | Variable       | Required?                     | Definition                            | Example                                     | Comments                                           |
@@ -54,28 +50,28 @@ Uses Bitcoin's RPC interface to get node data and display it in a Python Flask a
 N/A
 
 ### Example usage
-Below is an example `docker-compose.yml` file. Page will be available **only** over HTTPS at `https://YOUR_IP_ADDRESS:PORT_YOU_CHOSE` (there will be a self-signed certificate from Flask).
-```
-version: '3'
-services:
-  docker-bitcoind-status:
-    container_name: docker-bitcoind-status
-    restart: unless-stopped
-    environment:
-      - BITCOIND_HOST=10.10.1.4
-      - BITCOIND_PORT=8332
-      - RPC_USER=satoshi
-      - RPC_PASS=Bitc0inIsGreat1
-      - CURRENCY=USD
-      - PAGE_TITLE=Bitcoin is great
-    networks:
-      - bitcoin
-    ports:
-      - '5000:5000'
-    image: loganmarchione/docker-bitcoind-status:latest
 
-networks:
-  bitcoin:
+#### Build
+
+```
+git clone https://github.com/loganmarchione/docker-bitcoind-status.git
+cd docker-bitcoind-status
+sudo docker build --no-cache --file Dockerfile --tag loganmarchione/docker-bitcoind-status  .
+```
+
+#### Run
+Page will be available **only** over HTTPS at `https://YOUR_IP_ADDRESS:PORT_YOU_CHOSE` (there will be a self-signed certificate from Flask).
+
+```
+sudo docker run --name docker-bitcoind-status \
+  --env BITCOIND_HOST=10.10.1.32 \
+  --env BITCOIND_PORT=8332 \
+  --env RPC_USER=satoshi \
+  --env RPC_PASS=Bitc0inIsGreat1 \
+  --env CURRENCY=USD \
+  --env PAGE_TITLE="Bitcoin is great" \
+  -p 5000:5000 \
+  loganmarchione/docker-bitcoind-status
 ```
 
 ## TODO
